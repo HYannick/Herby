@@ -19,7 +19,7 @@ class Plants extends StatelessWidget {
       child: Card(
         elevation: 0.0,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

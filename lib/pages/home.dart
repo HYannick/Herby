@@ -28,7 +28,7 @@ class HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      body: _children[_currentIndex],
+      body: SafeArea(child: _children[_currentIndex]),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           // sets the background color of the `BottomNavigationBar`
@@ -94,14 +94,6 @@ class HomePageState extends State<HomePage> {
                 icon: Icon(Icons.person), title: Text('Profile'))
           ],
         ),
-      ),
-      appBar: AppBar(
-        title: Text(
-          'Herby',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.0,
       ),
     );
   }

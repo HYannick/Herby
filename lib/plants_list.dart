@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/plants.dart';
-import 'package:herby_app/plants_control.dart';
 
 class PlantsList extends StatelessWidget {
   final List<Map<String, dynamic>> plants;
@@ -13,7 +12,6 @@ class PlantsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Container(margin: EdgeInsets.all(10.0), child: PlantsControl(addPlant)),
         Expanded(child: Plants(plants: plants, deletePlant: deletePlant))
       ],
     );
