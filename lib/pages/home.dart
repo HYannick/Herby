@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/profile.dart';
-import 'package:herby_app/plants_manager.dart';
+import 'package:herby_app/plants_list.dart';
 
 class HomePage extends StatefulWidget {
   final List<Map<String, dynamic>> plants;
@@ -22,7 +22,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _children = [
-      PlantsManager(widget.plants, widget.addPlant, widget.deletePlant),
+      PlantsList(widget.plants, widget.addPlant, widget.deletePlant),
       PlantCreatePage(),
       ProfilePage()
     ];
