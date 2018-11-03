@@ -5,37 +5,20 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60.0,
-      color: Colors.white,
-      padding: EdgeInsets.all(5.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () {
-                print('Plants Tapped');
-              },
-              child: Column(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/plant-icon--green.png',
-                    width: 30.0,
-                  ),
-                  Text(
-                    'My plants',
-                    style: TextStyle(color: greenyColor),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Expanded(
+    return BottomNavigationBar(
+      currentIndex: 0, // this will be set when a new tab is tapped
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.nature),
+          title: Text('My plants'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.add),
+          title: Container(
+            height: 20.0,
             child: LayoutBuilder(builder: (context, constraints) {
               double stackWidth = 70.0;
-              double stackElevation = -40.0;
+              double stackElevation = -70.0;
               return Stack(
                 overflow: Overflow.visible,
                 children: [
@@ -71,20 +54,10 @@ class BottomNav extends StatelessWidget {
               );
             }),
           ),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.person,
-                  size: 30.0,
-                ),
-                Text('My Profile')
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.person), title: Text('Profile'))
+      ],
     );
   }
 }

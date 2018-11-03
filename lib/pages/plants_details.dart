@@ -23,36 +23,34 @@ class PlantsDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: WillPopScope(
-        onWillPop: () {
-          Navigator.pop(context, false);
-          return Future.value(false);
-        },
-        child: Scaffold(
-          body: Stack(
-            children: <Widget>[
-              GradientImageBackground(imgURL: imgURL, color: Colors.black87),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: SafeArea(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _buildNavigation(context),
-                          _buildTitle(title: title),
-                          _buildContent(),
-                        ],
-                      ),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pop(context, false);
+        return Future.value(false);
+      },
+      child: Scaffold(
+        bottomNavigationBar: BottomNav(),
+        body: Stack(
+          children: <Widget>[
+            GradientImageBackground(imgURL: imgURL, color: Colors.black87),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: SafeArea(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _buildNavigation(context),
+                        _buildTitle(title: title),
+                        _buildContent(),
+                      ],
                     ),
                   ),
-                  BottomNav()
-                ],
-              ),
-            ],
-          ),
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -88,15 +86,47 @@ class PlantsDetailsPage extends StatelessWidget {
                 icon: Icon(Icons.chevron_left),
                 color: Colors.white,
                 iconSize: 30.0,
-                onPressed: () => Navigator.pop(context, true)),
+                onPressed: () => Navigator.pop(context, false)),
             Spacer(),
-            IconButton(
-                icon: Icon(Icons.more_horiz),
-                color: Colors.white,
-                iconSize: 30.0,
-                onPressed: () => Navigator.pop(context)),
+            Row(
+              children: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.edit),
+                    color: Colors.white,
+                    iconSize: 30.0,
+                    onPressed: () => print('Edit Mode')),
+                IconButton(
+                    icon: Icon(Icons.delete_outline),
+                    color: Colors.white,
+                    iconSize: 30.0,
+                    onPressed: () => _showWarningDialog(context)),
+              ],
+            ),
           ],
         ));
+  }
+
+  Future _showWarningDialog(BuildContext context) {
+    return showDialog(
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Are you sure? :('),
+            content: Text('This action cannot be undone.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Nooo! Abort!'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              FlatButton(
+                  child: Text('Yes, Delete!'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context, true);
+                  })
+            ],
+          );
+        },
+        context: context);
   }
 
   Container _buildTitle({String title = ''}) {

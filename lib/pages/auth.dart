@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:herby_app/pages/plants_list.dart';
 
 class AuthPage extends StatelessWidget {
   @override
@@ -18,10 +17,7 @@ class AuthPage extends StatelessWidget {
             child: RaisedButton(
                 child: Text('Login'),
                 onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => PlantsList()));
+                  Navigator.pushReplacementNamed(context, '/home');
                 }),
           )),
     );

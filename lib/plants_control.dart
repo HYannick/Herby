@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PlantsControl extends StatelessWidget {
-  final Function addProduct;
-  PlantsControl(this.addProduct);
+  final Function addPlant;
+  PlantsControl(this.addPlant);
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class PlantsControl extends StatelessWidget {
       child: RaisedButton(
           child: Text('Add a plant :D'),
           onPressed: () {
-            addProduct({
+            addPlant({
               'title': 'Dracena Marginata',
               'imgURL': 'assets/Dracena Marginata.jpg',
               'description':
