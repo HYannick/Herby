@@ -57,7 +57,7 @@ class Plants extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
-        plants[index]['title'],
+        plants[index]['name'],
         textAlign: TextAlign.left,
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
       ),
@@ -77,7 +77,7 @@ class Plants extends StatelessWidget {
                 style: TextStyle(fontSize: 18.0, color: Colors.white),
               ),
               Text(
-                '8 days',
+                '${plant['daysLeft']} days',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20.0,

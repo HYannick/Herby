@@ -15,7 +15,8 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   final List<Map<String, dynamic>> _plants = [];
 
-  void _addPlant(Map plant) {
+  void _addPlant(Map<String, dynamic> plant) {
+    print(plant['name']);
     setState(() {
       _plants.add(plant);
     });
@@ -30,6 +31,7 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         routes: {
           '/': (BuildContext context) => AuthPage(),
           '/home': (BuildContext context) =>
@@ -44,13 +46,7 @@ class MyAppState extends State<MyApp> {
             final int index = int.parse(pathElements[2]);
             Map plant = _plants[index];
             return MaterialPageRoute<bool>(
-                builder: (BuildContext context) => PlantsDetailsPage(
-                      title: plant['title'],
-                      imgURL: plant['imgURL'],
-                      description: plant['description'],
-                      daysLeft: plant['daysLeft'],
-                      frequency: plant['frequency'],
-                    ));
+                builder: (BuildContext context) => PlantsDetailsPage(plant));
           }
           return null;
         },

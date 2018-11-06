@@ -3,23 +3,14 @@ import 'package:herby_app/components/bottomNav.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 
 class PlantsDetailsPage extends StatelessWidget {
-  final String title;
-  final String imgURL;
-  final String description;
-  final int daysLeft;
-  final int frequency;
+  final Map<String, dynamic> plant;
 
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
 
-  PlantsDetailsPage(
-      {this.title,
-      this.imgURL,
-      this.description,
-      this.daysLeft,
-      this.frequency});
+  PlantsDetailsPage(this.plant);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +23,8 @@ class PlantsDetailsPage extends StatelessWidget {
         bottomNavigationBar: BottomNav(),
         body: Stack(
           children: <Widget>[
-            GradientImageBackground(imgURL: imgURL, color: Colors.black87),
+            GradientImageBackground(
+                imgURL: plant['imgURL'], color: Colors.black87),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -42,7 +34,7 @@ class PlantsDetailsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         _buildNavigation(context),
-                        _buildTitle(title: title),
+                        _buildTitle(title: plant['name']),
                         _buildContent(),
                       ],
                     ),
@@ -69,8 +61,9 @@ class PlantsDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _buildHeader(date: 3, frequency: 15),
-            _buildDescription(description: description),
+            _buildHeader(
+                date: plant['daysLeft'], frequency: plant['frequency'].round()),
+            _buildDescription(description: plant['description']),
           ],
         ),
       ),
@@ -140,7 +133,7 @@ class PlantsDetailsPage extends StatelessWidget {
     );
   }
 
-  Row _buildHeader({date: '0', frequency: '0'}) {
+  Row _buildHeader({date: 0, frequency: 0.0}) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -153,11 +146,11 @@ class PlantsDetailsPage extends StatelessWidget {
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text('${daysLeft} days',
+                child: Text('${plant['daysLeft']} days',
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0)),
               ),
-              Text('Watering every ${frequency} days',
+              Text('Watering every ${plant['frequency'].round()} days',
                   style: TextStyle(color: blueyColor, fontSize: 15.0)),
             ],
           ),

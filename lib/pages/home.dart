@@ -23,7 +23,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> _children = [
       PlantsList(widget.plants, widget.addPlant, widget.deletePlant),
-      PlantCreatePage(),
+      PlantCreatePage(widget.addPlant),
       ProfilePage()
     ];
 
