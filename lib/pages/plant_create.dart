@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:herby_app/components/date_time_picker.dart';
 
 class PlantCreatePage extends StatefulWidget {
-  final Function addPlant;
-  PlantCreatePage(this.addPlant);
+  PlantCreatePage();
 
   @override
   PlantCreatePageState createState() {
@@ -14,6 +13,7 @@ class PlantCreatePage extends StatefulWidget {
 class PlantCreatePageState extends State<PlantCreatePage> {
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
   double frequency = 1.0;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> plantForm = {
     'name': '',
     'imgURL': 'assets/Aloe Vera.jpg',
@@ -25,39 +25,62 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ListView(
-        children: <Widget>[
-          Center(
-            child: Text(
-              'Add your Plant details!',
-              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-            ),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              Center(
+                child: Text(
+                  'Add your Plant details!',
+                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                ),
+              ),
+              _buildTextFormField(TextInputType.text, 'name', 'Name',
+                  minChar: 2),
+              _buildTextFormField(
+                  TextInputType.multiline, 'description', 'Description',
+                  minChar: 2),
+              _buildWateringDatePicker(),
+              _buildFrequencyInput(),
+              RaisedButton(
+                child: Text('Add Plant'),
+                onPressed: _submitPlant,
+              )
+            ],
           ),
-          _buildTextField(TextInputType.text, 'name', 'Name'),
-          _buildTextField(
-              TextInputType.multiline, 'description', 'Description'),
-          _buildWateringDatePicker(),
-          _buildFrequencyInput(),
-          RaisedButton(
-            child: Text('Add Plant'),
-            onPressed: () {
-              plantForm['frequency'] = frequency.round();
-              plantForm['daysLeft'] = plantForm['lastWatering']
-                      .add(Duration(days: plantForm['frequency']))
-                      .day -
-                  DateTime.now().day;
-
-              if (plantForm['daysLeft'] < 0) {
-                plantForm['daysLeft'] = 0;
-              }
-              widget.addPlant(plantForm);
-            },
-          )
-        ],
+        ),
       ),
     );
+  }
+
+  void _submitPlant() {
+    if (!_formKey.currentState.validate() ||
+        plantForm['lastWatering'] == null) {
+      return;
+    }
+    plantForm['frequency'] = frequency.round();
+    plantForm['daysLeft'] = plantForm['lastWatering']
+            .add(Duration(days: plantForm['frequency']))
+            .day -
+        DateTime.now().day;
+
+    if (plantForm['daysLeft'] < 0) {
+      plantForm['daysLeft'] = 0;
+    }
+    _formKey.currentState.save();
+//    widget.addPlant(Plant(
+//        frequency: plantForm['frequency'],
+//        imgURL: plantForm['imgURL'],
+//        lastWatering: plantForm['lastWatering'],
+//        daysLeft: plantForm['daysLeft'],
+//        description: plantForm['description'],
+//        name: plantForm['name']));
   }
 
   Column _buildWateringDatePicker() {
@@ -119,23 +142,20 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     );
   }
 
-  TextField _buildTextField(
-      TextInputType keyboardType, String field, String label) {
-    return TextField(
-      keyboardType: keyboardType,
-      maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
-      decoration: InputDecoration(labelText: label),
-      onChanged: (String value) {
-        setState(() {
-          plantForm[field] = value;
-        });
-      },
-    );
+  TextFormField _buildTextFormField(
+      TextInputType keyboardType, String field, String label,
+      {int minChar}) {
+    return TextFormField(
+        keyboardType: keyboardType,
+        maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
+        decoration: InputDecoration(labelText: label),
+        validator: (String value) {
+          if (value.isEmpty || value.length <= minChar) {
+            return '$label is required and should be $minChar+ characters long.';
+          }
+        },
+        onSaved: (String value) => plantForm[field] = value);
   }
 
-  void _submitDate(date) {
-    setState(() {
-      plantForm['lastWatering'] = date;
-    });
-  }
+  void _submitDate(date) => plantForm['lastWatering'] = date;
 }

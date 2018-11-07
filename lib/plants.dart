@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:herby_app/models/plant.dart';
+import 'package:herby_app/scoped-models/plants.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class Plants extends StatelessWidget {
-  final List<Map<String, dynamic>> plants;
-
-  final Function deletePlant;
-
-  Plants({this.plants = const [], this.deletePlant});
-
-  Widget _buildPlantItem(BuildContext context, int index) {
+  Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants) {
     return GestureDetector(
       onTap: () => Navigator.of(context)
               .pushNamed<bool>('/plant/${index.toString()}')
               .then((bool value) {
-            if (value) {
-              deletePlant(index);
-            }
+            if (value) {}
           }),
       child: Card(
         elevation: 0.0,
@@ -23,7 +18,7 @@ class Plants extends StatelessWidget {
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildTitle(index),
+                _buildTitle(plants[index]),
                 Container(
                     constraints: BoxConstraints.expand(
                       height:
@@ -33,7 +28,7 @@ class Plants extends StatelessWidget {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5.0),
                         image: DecorationImage(
-                            image: ExactAssetImage(plants[index]['imgURL']),
+                            image: ExactAssetImage(plants[index].imgURL),
                             fit: BoxFit.cover,
                             alignment: Alignment(0.0, 0.25))),
                     child: Container(
@@ -53,18 +48,18 @@ class Plants extends StatelessWidget {
     );
   }
 
-  Padding _buildTitle(int index) {
+  Padding _buildTitle(Plant plant) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
-        plants[index]['name'],
+        plant.name,
         textAlign: TextAlign.left,
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
       ),
     );
   }
 
-  Row _buildDescription(BuildContext context, Map plant, int index) {
+  Row _buildDescription(BuildContext context, Plant plant, int index) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -77,7 +72,7 @@ class Plants extends StatelessWidget {
                 style: TextStyle(fontSize: 18.0, color: Colors.white),
               ),
               Text(
-                '${plant['daysLeft']} days',
+                '${plant.daysLeft} days',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20.0,
@@ -97,11 +92,12 @@ class Plants extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantList() {
+  Widget _buildPlantList(List<Plant> plants) {
     Widget plantList = Center(child: Text('Let\'s add some plants :D'));
     if (plants.length > 0) {
       plantList = ListView.builder(
-        itemBuilder: _buildPlantItem,
+        itemBuilder: (BuildContext context, int index) =>
+            _buildPlantItem(context, index, plants),
         itemCount: plants.length,
       );
     }
@@ -110,6 +106,9 @@ class Plants extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildPlantList();
+    return ScopedModelDescendant<PlantsModel>(
+        builder: (BuildContext context, Widget child, PlantsModel model) {
+      return _buildPlantList(model.plants);
+    });
   }
 }

@@ -13,29 +13,14 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  final List<Map<String, dynamic>> _plants = [];
-
-  void _addPlant(Map<String, dynamic> plant) {
-    print(plant['name']);
-    setState(() {
-      _plants.add(plant);
-    });
-  }
-
-  void _deletePlant(int index) {
-    setState(() {
-      _plants.removeAt(index);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        theme: ThemeData(fontFamily: 'Nunito'),
         debugShowCheckedModeBanner: false,
         routes: {
           '/': (BuildContext context) => AuthPage(),
-          '/home': (BuildContext context) =>
-              HomePage(_plants, _addPlant, _deletePlant)
+          '/home': (BuildContext context) => HomePage()
         },
         onGenerateRoute: (RouteSettings settings) {
           final List<String> pathElements = settings.name.split('/');
@@ -44,16 +29,14 @@ class MyAppState extends State<MyApp> {
           }
           if (pathElements[1].startsWith('plant')) {
             final int index = int.parse(pathElements[2]);
-            Map plant = _plants[index];
             return MaterialPageRoute<bool>(
-                builder: (BuildContext context) => PlantsDetailsPage(plant));
+                builder: (BuildContext context) => PlantsDetailsPage(null));
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  HomePage(_plants, _addPlant, _deletePlant));
+              builder: (BuildContext context) => HomePage());
         });
   }
 }

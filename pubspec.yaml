@@ -14,6 +14,7 @@ environment:
 
 dependencies:
   intl: ^0.15.7
+  scoped_model: ^0.3.0
   flutter:
     sdk: flutter
 
@@ -44,6 +45,7 @@ flutter:
     - assets/drop-icon--white.png
     - assets/drop-icon--white-outline.png
     - assets/plant-icon--green.png
+    - assets/auth_background@2x.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -57,12 +59,16 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-Light.ttf
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-Italic.ttf
+        - asset: assets/fonts/Nunito-Bold.ttf
+          style: normal
+          weight: 700
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

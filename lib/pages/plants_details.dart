@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/components/bottomNav.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
+import 'package:herby_app/models/plant.dart';
 
 class PlantsDetailsPage extends StatelessWidget {
-  final Map<String, dynamic> plant;
+  final Plant plant;
 
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
@@ -24,7 +25,7 @@ class PlantsDetailsPage extends StatelessWidget {
         body: Stack(
           children: <Widget>[
             GradientImageBackground(
-                imgURL: plant['imgURL'], color: Colors.black87),
+                imgURL: plant.imgURL, color: Colors.black87),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -34,7 +35,7 @@ class PlantsDetailsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         _buildNavigation(context),
-                        _buildTitle(title: plant['name']),
+                        _buildTitle(title: plant.name),
                         _buildContent(),
                       ],
                     ),
@@ -62,8 +63,8 @@ class PlantsDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _buildHeader(
-                date: plant['daysLeft'], frequency: plant['frequency'].round()),
-            _buildDescription(description: plant['description']),
+                date: plant.daysLeft, frequency: plant.frequency.round()),
+            _buildDescription(description: plant.description),
           ],
         ),
       ),
@@ -146,11 +147,11 @@ class PlantsDetailsPage extends StatelessWidget {
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text('${plant['daysLeft']} days',
+                child: Text('$date days',
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0)),
               ),
-              Text('Watering every ${plant['frequency'].round()} days',
+              Text('Watering every $frequency days',
                   style: TextStyle(color: blueyColor, fontSize: 15.0)),
             ],
           ),

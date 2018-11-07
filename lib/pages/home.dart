@@ -4,11 +4,7 @@ import 'package:herby_app/pages/profile.dart';
 import 'package:herby_app/plants_list.dart';
 
 class HomePage extends StatefulWidget {
-  final List<Map<String, dynamic>> plants;
-  final Function addPlant;
-  final Function deletePlant;
-
-  HomePage(this.plants, this.addPlant, this.deletePlant);
+  HomePage();
 
   @override
   HomePageState createState() {
@@ -22,8 +18,8 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _children = [
-      PlantsList(widget.plants, widget.addPlant, widget.deletePlant),
-      PlantCreatePage(widget.addPlant),
+      PlantsList(),
+      PlantCreatePage(),
       ProfilePage()
     ];
 
