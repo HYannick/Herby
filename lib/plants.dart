@@ -4,7 +4,9 @@ import 'package:herby_app/scoped-models/plants.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Plants extends StatelessWidget {
+  PlantsModel _plantModel = PlantsModel();
   Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants) {
+    print(plants);
     return GestureDetector(
       onTap: () => Navigator.of(context)
               .pushNamed<bool>('/plant/${index.toString()}')
@@ -106,9 +108,13 @@ class Plants extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<PlantsModel>(
-        builder: (BuildContext context, Widget child, PlantsModel model) {
-      return _buildPlantList(model.plants);
-    });
+    return ScopedModel<PlantsModel>(
+      model: _plantModel,
+      child: ScopedModelDescendant<PlantsModel>(builder:
+          (BuildContext scopedContext, Widget child, PlantsModel model) {
+        print(model.plants);
+        return _buildPlantList(model.plants);
+      }),
+    );
   }
 }

@@ -4,15 +4,14 @@ import 'package:scoped_model/scoped_model.dart';
 class PlantsModel extends Model {
   List<Plant> _plants = [];
 
-  List<Plant> get plants {
-    return List.from(_plants);
-  }
+  List<Plant> get plants => List.from(_plants);
 
-  void _addPlant(Plant plant) {
+  void addPlant(Plant plant) {
     _plants.add(plant);
+    notifyListeners();
   }
 
-  void _deletePlant(int index) {
+  void deletePlant(int index) {
     _plants.removeAt(index);
   }
 }

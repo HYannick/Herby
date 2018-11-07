@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/components/date_time_picker.dart';
+import 'package:herby_app/models/plant.dart';
+import 'package:herby_app/scoped-models/plants.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class PlantCreatePage extends StatefulWidget {
   PlantCreatePage();
@@ -11,6 +14,7 @@ class PlantCreatePage extends StatefulWidget {
 }
 
 class PlantCreatePageState extends State<PlantCreatePage> {
+  PlantsModel _plantModel = PlantsModel();
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
   double frequency = 1.0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -48,10 +52,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                   minChar: 2),
               _buildWateringDatePicker(),
               _buildFrequencyInput(),
-              RaisedButton(
-                child: Text('Add Plant'),
-                onPressed: _submitPlant,
-              )
+              _buildSubmitButton()
             ],
           ),
         ),
@@ -59,7 +60,19 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     );
   }
 
-  void _submitPlant() {
+  ScopedModel _buildSubmitButton() {
+    return ScopedModel<PlantsModel>(
+      model: _plantModel,
+      child: ScopedModelDescendant<PlantsModel>(builder:
+          (BuildContext scopedContext, Widget child, PlantsModel model) {
+        return RaisedButton(
+            child: Text('Add Plant'),
+            onPressed: () => _submitPlant(model.addPlant, model.plants));
+      }),
+    );
+  }
+
+  void _submitPlant(Function addPlant, List<Plant> plants) {
     if (!_formKey.currentState.validate() ||
         plantForm['lastWatering'] == null) {
       return;
@@ -74,13 +87,13 @@ class PlantCreatePageState extends State<PlantCreatePage> {
       plantForm['daysLeft'] = 0;
     }
     _formKey.currentState.save();
-//    widget.addPlant(Plant(
-//        frequency: plantForm['frequency'],
-//        imgURL: plantForm['imgURL'],
-//        lastWatering: plantForm['lastWatering'],
-//        daysLeft: plantForm['daysLeft'],
-//        description: plantForm['description'],
-//        name: plantForm['name']));
+    addPlant(Plant(
+        frequency: plantForm['frequency'],
+        imgURL: plantForm['imgURL'],
+        lastWatering: plantForm['lastWatering'],
+        daysLeft: plantForm['daysLeft'],
+        description: plantForm['description'],
+        name: plantForm['name']));
   }
 
   Column _buildWateringDatePicker() {
