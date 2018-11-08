@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:herby_app/components/bottomNav.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
+import 'package:herby_app/scoped-models/plants.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class PlantsDetailsPage extends StatelessWidget {
-  final Plant plant;
+  final int plantIndex;
 
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
 
-  PlantsDetailsPage(this.plant);
+  PlantsDetailsPage(this.plantIndex);
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        Navigator.pop(context, false);
-        return Future.value(false);
-      },
-      child: Scaffold(
+    return WillPopScope(onWillPop: () {
+      Navigator.pop(context, false);
+      return Future.value(false);
+    }, child: ScopedModelDescendant<PlantsModel>(
+        builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
+      Plant plant = model.plants[plantIndex];
+      return Scaffold(
         bottomNavigationBar: BottomNav(),
         body: Stack(
           children: <Widget>[
@@ -36,7 +39,7 @@ class PlantsDetailsPage extends StatelessWidget {
                       children: <Widget>[
                         _buildNavigation(context),
                         _buildTitle(title: plant.name),
-                        _buildContent(),
+                        _buildContent(plant),
                       ],
                     ),
                   ),
@@ -45,11 +48,11 @@ class PlantsDetailsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
+    }));
   }
 
-  Expanded _buildContent() {
+  Expanded _buildContent(Plant plant) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.only(top: 30.0, left: 30.0, right: 30.0),

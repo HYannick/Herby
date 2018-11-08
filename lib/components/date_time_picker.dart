@@ -25,7 +25,7 @@ class DateTimePickerState extends State<DateTimePicker> {
         firstDate: DateTime(2016),
         lastDate: DateTime(2019));
 
-    if (picked != null && picked != _date) {
+    if (picked != null) {
       setState(() {
         _date = picked;
       });

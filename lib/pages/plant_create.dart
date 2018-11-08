@@ -14,7 +14,6 @@ class PlantCreatePage extends StatefulWidget {
 }
 
 class PlantCreatePageState extends State<PlantCreatePage> {
-  PlantsModel _plantModel = PlantsModel();
   final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
   double frequency = 1.0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -60,16 +59,13 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     );
   }
 
-  ScopedModel _buildSubmitButton() {
-    return ScopedModel<PlantsModel>(
-      model: _plantModel,
-      child: ScopedModelDescendant<PlantsModel>(builder:
-          (BuildContext scopedContext, Widget child, PlantsModel model) {
-        return RaisedButton(
-            child: Text('Add Plant'),
-            onPressed: () => _submitPlant(model.addPlant, model.plants));
-      }),
-    );
+  ScopedModelDescendant _buildSubmitButton() {
+    return ScopedModelDescendant<PlantsModel>(
+        builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
+      return RaisedButton(
+          child: Text('Add Plant'),
+          onPressed: () => _submitPlant(model.addPlant, model.plants));
+    });
   }
 
   void _submitPlant(Function addPlant, List<Plant> plants) {
