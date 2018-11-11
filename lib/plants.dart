@@ -42,31 +42,35 @@ class Plants extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                          height: 130.0,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              image: DecorationImage(
-                                  image: ExactAssetImage(plants[index].imgURL),
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment(0.0, 0.25))),
-                          child: Container(
-                            padding: EdgeInsets.all(15.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              gradient: new LinearGradient(
-                                  colors: [Colors.black87, Colors.transparent],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment(0.0, 0.3)),
-                            ),
-                            child: _buildDescription(
-                                context, plants[index], index),
-                          ))
-                    ]),
+                child: Stack(children: <Widget>[
+                  Hero(
+                    tag: 'plantImg-$index',
+                    child: Container(
+                        constraints: BoxConstraints.expand(height: 130.0),
+                        height: 130.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Image.asset(
+                          plants[index].imgURL,
+                          fit: BoxFit.cover,
+                        )),
+                  ),
+                  Container(
+                    height: 130.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient: new LinearGradient(
+                          colors: [Colors.black87, Colors.transparent],
+                          begin: Alignment.topCenter,
+                          end: Alignment(0.0, 0.3)),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: _buildDescription(context, plants[index], index),
+                  )
+                ]),
               ),
             ],
           ),

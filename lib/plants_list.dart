@@ -7,9 +7,6 @@ class PlantsList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
-        SizedBox(
-          height: 30.0,
-        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Text(

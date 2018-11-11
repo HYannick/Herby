@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:herby_app/components/bottomNav.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/plants.dart';
@@ -24,11 +23,13 @@ class PlantsDetailsPage extends StatelessWidget {
         builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
       Plant plant = model.plants[plantIndex];
       return Scaffold(
-        bottomNavigationBar: BottomNav(),
         body: Stack(
           children: <Widget>[
-            GradientImageBackground(
-                imgURL: plant.imgURL, color: Colors.black87),
+            Hero(
+              tag: 'plantImg-$plantIndex',
+              child: GradientImageBackground(
+                  imgURL: plant.imgURL, color: Colors.black87),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

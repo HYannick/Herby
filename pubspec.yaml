@@ -53,6 +53,7 @@ flutter:
     - assets/avatar-sample.jpg
     - assets/home-bg.jpg
     - assets/plant-icon--outline.svg
+    - assets/photo-icon--outline.svg
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

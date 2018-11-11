@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herby_app/components/custom_notched_shapes.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
-import 'package:herby_app/pages/plant_create.dart';
+import 'package:herby_app/pages/plant_search.dart';
 import 'package:herby_app/pages/profile.dart';
 import 'package:herby_app/plants_list.dart';
 
@@ -27,7 +27,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> _children = [
       PlantsList(),
-      PlantCreatePage(),
+      PlantSearchPage(),
       ProfilePage()
     ];
     // _children[_currentIndex]
@@ -53,11 +53,13 @@ class HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         elevation: 5.0,
         backgroundColor: Colors.white,
-        child: const Icon(
-          Icons.add,
-          size: 45.0,
-          color: Color.fromRGBO(140, 216, 207, 1.0),
-        ),
+        child: _currentIndex == 1
+            ? SvgPicture.asset('assets/photo-icon--outline.svg')
+            : Icon(
+                Icons.add,
+                size: 45.0,
+                color: Color.fromRGBO(140, 216, 207, 1.0),
+              ),
         onPressed: () {
           setState(() {
             _currentIndex = 1;
@@ -99,26 +101,15 @@ class HomePageState extends State<HomePage> {
   }
 
   Padding _buildHeader() {
+    Map<String, String> title = {'s1': 'Hello, ', 's2': '$username!'};
+    if (_currentIndex == 1) {
+      title = {'s1': 'Find your ', 's2': 'Plants!'};
+    }
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
         children: <Widget>[
-          Expanded(
-              child: Row(
-            children: <Widget>[
-              Text(
-                'Hello ',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
-              ),
-              Text(
-                '$username!',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25.0,
-                    color: mainGreen),
-              ),
-            ],
-          )),
+          _buildHeadTitle(title),
           Container(
             width: 70.0,
             height: 70.0,
@@ -136,6 +127,23 @@ class HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Expanded _buildHeadTitle(Map<String, String> title) {
+    return Expanded(
+        child: Row(
+      children: <Widget>[
+        Text(
+          title['s1'],
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
+        ),
+        Text(
+          title['s2'],
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 25.0, color: mainGreen),
+        ),
+      ],
+    ));
   }
 
   void onTabTapped(int index) {
