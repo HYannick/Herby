@@ -13,6 +13,8 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
+  transparent_image: ^0.1.0
+  flutter_svg: ^0.6.3
   intl: ^0.15.7
   scoped_model: ^0.3.0
   flutter:
@@ -46,6 +48,11 @@ flutter:
     - assets/drop-icon--white-outline.png
     - assets/plant-icon--green.png
     - assets/auth_background@2x.png
+    - assets/drop-logo-icon--white.png
+    - assets/drop-logo--plain.svg
+    - assets/avatar-sample.jpg
+    - assets/home-bg.jpg
+    - assets/plant-icon--outline.svg
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
