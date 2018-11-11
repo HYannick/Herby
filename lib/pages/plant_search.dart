@@ -32,6 +32,7 @@ class PlantSearchPageState extends State<PlantSearchPage> {
       },
       child: Column(
         children: <Widget>[
+          _buildSearchField(),
           Expanded(
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
@@ -40,10 +41,8 @@ class PlantSearchPageState extends State<PlantSearchPage> {
                   return _buildSearchField();
                 }
                 index -= 1;
-                print(results[index]);
-                // return row
-                var row = results[index];
-                return _buildPlantItem(context, index, row);
+
+                return _buildPlantItem(context, index, results);
               },
               itemCount: results.length,
             ),
