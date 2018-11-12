@@ -124,7 +124,6 @@ class Plants extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<PlantsModel>(
         builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
-      print(model.plants);
       return _buildPlantList(model.plants);
     });
   }

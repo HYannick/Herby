@@ -61,6 +61,9 @@ class HomePageState extends State<HomePage> {
                 color: Color.fromRGBO(140, 216, 207, 1.0),
               ),
         onPressed: () {
+          if (_currentIndex == 1) {
+            return Navigator.pushNamed(context, '/plant-create');
+          }
           setState(() {
             _currentIndex = 1;
           });

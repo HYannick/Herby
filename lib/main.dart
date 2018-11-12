@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/pages/auth.dart';
 import 'package:herby_app/pages/home.dart';
+import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/plants_details.dart';
 import 'package:herby_app/scoped-models/plants.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -24,7 +25,8 @@ class MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           routes: {
             '/': (BuildContext context) => AuthPage(),
-            '/home': (BuildContext context) => HomePage()
+            '/home': (BuildContext context) => HomePage(),
+            '/plant-create': (BuildContext context) => PlantCreatePage()
           },
           onGenerateRoute: (RouteSettings settings) {
             final List<String> pathElements = settings.name.split('/');

@@ -28,31 +28,34 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              Center(
-                child: Text(
-                  'Add your Plant details!',
-                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    'Plants Infos',
+                    style:
+                        TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              _buildTextFormField(TextInputType.text, 'name', 'Name',
-                  minChar: 2),
-              _buildTextFormField(
-                  TextInputType.multiline, 'description', 'Description',
-                  minChar: 2),
-              _buildWateringDatePicker(),
-              _buildFrequencyInput(),
-              _buildSubmitButton()
-            ],
+                _buildTextFormField(TextInputType.text, 'name', 'Name',
+                    minChar: 2),
+                _buildTextFormField(
+                    TextInputType.multiline, 'description', 'Description',
+                    minChar: 2),
+                _buildWateringDatePicker(),
+                _buildFrequencyInput(),
+                _buildSubmitButton()
+              ],
+            ),
           ),
         ),
       ),
@@ -157,7 +160,9 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     return TextFormField(
         keyboardType: keyboardType,
         maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
-        decoration: InputDecoration(labelText: label),
+        decoration: InputDecoration(
+          labelText: label,
+        ),
         validator: (String value) {
           if (value.isEmpty || value.length <= minChar) {
             return '$label is required and should be $minChar+ characters long.';

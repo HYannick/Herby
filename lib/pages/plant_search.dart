@@ -11,18 +11,17 @@ class PlantSearchPage extends StatefulWidget {
 }
 
 class PlantSearchPageState extends State<PlantSearchPage> {
-  final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
+  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
   List<Map> results = [
-    {'imgURL': 'https://source.unsplash.com/200x202/?nature', 'name': 'Ecchi'},
-    {'imgURL': 'https://source.unsplash.com/200x203/?nature', 'name': 'Yaoi'},
-    {'imgURL': 'https://source.unsplash.com/200x204/?nature', 'name': 'Yuri'},
-    {'imgURL': 'https://source.unsplash.com/200x205/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x206/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x207/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x258/?nature', 'name': 'Patate'},
+//    {'imgURL': 'https://source.unsplash.com/200x202/?nature', 'name': 'Ecchi'},
+//    {'imgURL': 'https://source.unsplash.com/200x203/?nature', 'name': 'Yaoi'},
+//    {'imgURL': 'https://source.unsplash.com/200x204/?nature', 'name': 'Yuri'},
+//    {'imgURL': 'https://source.unsplash.com/200x205/?nature', 'name': 'Patate'},
+//    {'imgURL': 'https://source.unsplash.com/200x206/?nature', 'name': 'Patate'},
+//    {'imgURL': 'https://source.unsplash.com/200x207/?nature', 'name': 'Patate'},
+//    {'imgURL': 'https://source.unsplash.com/200x258/?nature', 'name': 'Patate'},
   ];
   String searchValue;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,20 +35,47 @@ class PlantSearchPageState extends State<PlantSearchPage> {
           Expanded(
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  // return the header
-                  return _buildSearchField();
-                }
-                index -= 1;
-
+//                if (index == 0) {
+//                  return _buildSearchField();
+//                }
+//                if (index == results.length - 1) {
+//                  return _buildEndListInfo();
+//                }
+//                index -= 1;
                 return _buildPlantItem(context, index, results);
               },
               itemCount: results.length,
             ),
-          )
+          ),
+          _buildEndListInfo()
         ],
       ),
     );
+  }
+
+  Container _buildEndListInfo() {
+    return Container(
+        child: Column(
+      children: <Widget>[
+        SizedBox(
+          height: 10.0,
+        ),
+        Text(
+          'Cannot find it?',
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w200),
+        ),
+        Text('Take a beautiful picture',
+            style: TextStyle(
+                fontSize: 20.0, fontWeight: FontWeight.bold, color: mainGreen)),
+        Text(
+          'And fill the database!',
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w200),
+        ),
+        SizedBox(
+          height: 50.0,
+        )
+      ],
+    ));
   }
 
   Container _buildPlantItem(BuildContext context, index, results) {
@@ -102,7 +128,6 @@ class PlantSearchPageState extends State<PlantSearchPage> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Form(
-        key: _formKey,
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 5.0),
           decoration: BoxDecoration(
