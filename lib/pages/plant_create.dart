@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/components/date_time_picker.dart';
+import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/plants.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -14,7 +15,8 @@ class PlantCreatePage extends StatefulWidget {
 }
 
 class PlantCreatePageState extends State<PlantCreatePage> {
-  final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
+  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
+  final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
   double frequency = 1.0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> plantForm = {
@@ -33,31 +35,61 @@ class PlantCreatePageState extends State<PlantCreatePage> {
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: ListView(
+        child: Stack(
+          children: <Widget>[
+            Container(
+              height: 400.0,
+              child: GradientImageBackground(
+                  imgURL: 'assets/Dracena Marginata.jpg',
+                  color: Color.fromRGBO(219, 237, 145, 1.0),
+                  fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
+                  gradientOpacity: 0.50),
+            ),
+            ListView(
               children: <Widget>[
-                Center(
-                  child: Text(
-                    'Plants Infos',
-                    style:
-                        TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                  ),
+                _buildTitle(),
+                Container(
+                  padding: EdgeInsets.all(30.0),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.only(topRight: Radius.circular(50.0))),
+                  child: _buildForm(),
                 ),
-                _buildTextFormField(TextInputType.text, 'name', 'Name',
-                    minChar: 2),
-                _buildTextFormField(
-                    TextInputType.multiline, 'description', 'Description',
-                    minChar: 2),
-                _buildWateringDatePicker(),
-                _buildFrequencyInput(),
-                _buildSubmitButton()
               ],
             ),
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Form _buildForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          _buildTextFormField(TextInputType.text, 'name', 'Name', minChar: 2),
+          _buildTextFormField(
+              TextInputType.multiline, 'description', 'Description',
+              minChar: 2),
+          _buildWateringDatePicker(),
+          _buildFrequencyInput(),
+          _buildSubmitButton()
+        ],
+      ),
+    );
+  }
+
+  Container _buildTitle() {
+    return Container(
+      height: 300.0,
+      padding: const EdgeInsets.all(20.0),
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(
+        'Plants\nInfos',
+        style: TextStyle(
+            fontSize: 45.0, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
@@ -65,9 +97,26 @@ class PlantCreatePageState extends State<PlantCreatePage> {
   ScopedModelDescendant _buildSubmitButton() {
     return ScopedModelDescendant<PlantsModel>(
         builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
-      return RaisedButton(
-          child: Text('Add Plant'),
-          onPressed: () => _submitPlant(model.addPlant, model.plants));
+      return Container(
+        width: 170.0,
+        decoration: BoxDecoration(
+          color: mainGreen,
+          borderRadius: BorderRadius.circular(15.0),
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromRGBO(51, 51, 51, 0.1),
+                offset: Offset(4.0, 4.0),
+                spreadRadius: 1.0,
+                blurRadius: 5.0)
+          ],
+        ),
+        child: FlatButton(
+            child: Text(
+              'Add Plant',
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            ),
+            onPressed: () => _submitPlant(model.addPlant, model.plants)),
+      );
     });
   }
 
@@ -97,60 +146,87 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
   Column _buildWateringDatePicker() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15.0),
-          child: Text('When was your last watering?'),
         ),
-        DateTimePicker(_submitDate),
+        Container(
+          width: 170.0,
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                  color: Color.fromRGBO(51, 51, 51, 0.1),
+                  offset: Offset(4.0, 4.0),
+                  spreadRadius: 1.0,
+                  blurRadius: 5.0)
+            ],
+          ),
+          child: DateTimePicker(
+            _submitDate,
+            label: 'Last Watering',
+          ),
+        ),
       ],
     );
   }
 
-  Row _buildFrequencyInput() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          flex: 3,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Text('Watering Frequency'),
-              ),
-              Slider(
-                label: 'Watering Frequency',
-                onChanged: (double value) {
-                  setState(() {
-                    frequency = value.roundToDouble();
-                  });
-                },
-                value: frequency,
-                max: 30.0,
-                min: 1.0,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-            decoration: BoxDecoration(
-                color: greenyColor, borderRadius: BorderRadius.circular(20.0)),
-            child: Center(
-              child: Text(
-                frequency.round().toString(),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.bold),
-              ),
+  Container _buildFrequencyInput() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 30.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Watering Frequency'),
+                ),
+                Slider(
+                  label: 'Watering Frequency',
+                  activeColor: mainGreen,
+                  inactiveColor: fadedGreen,
+                  onChanged: (double value) {
+                    setState(() {
+                      frequency = value.roundToDouble();
+                    });
+                  },
+                  value: frequency,
+                  max: 30.0,
+                  min: 1.0,
+                ),
+              ],
             ),
           ),
-        )
-      ],
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              decoration: BoxDecoration(
+                  color: mainGreen,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25.0),
+                      topRight: Radius.circular(10.0),
+                      bottomLeft: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0))),
+              child: Center(
+                child: Text(
+                  frequency.round().toString(),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 35.0,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -161,7 +237,13 @@ class PlantCreatePageState extends State<PlantCreatePage> {
         keyboardType: keyboardType,
         maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
         decoration: InputDecoration(
-          labelText: label,
+          hintText: label,
+          hintStyle:
+              TextStyle(fontWeight: FontWeight.bold, color: Colors.black38),
+          enabledBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: mainGreen)),
+          focusedBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: mainGreen)),
         ),
         validator: (String value) {
           if (value.isEmpty || value.length <= minChar) {

@@ -8,7 +8,8 @@ class PlantsDetailsPage extends StatelessWidget {
   final int plantIndex;
 
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
-  final Color greenyColor = Color.fromRGBO(39, 200, 181, 1.0);
+  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
+  final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
 
@@ -25,27 +26,22 @@ class PlantsDetailsPage extends StatelessWidget {
       return Scaffold(
         body: Stack(
           children: <Widget>[
-            Hero(
-              tag: 'plantImg-$plantIndex',
-              child: GradientImageBackground(
-                  imgURL: plant.imgURL, color: Colors.black87),
+            Container(
+              height: 400.0,
+              child: Hero(
+                tag: 'plantImg-$plantIndex',
+                child: GradientImageBackground(
+                    imgURL: plant.imgURL, color: Colors.black87),
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: SafeArea(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _buildNavigation(context),
-                        _buildTitle(title: plant.name),
-                        _buildContent(plant),
-                      ],
-                    ),
-                  ),
-                )
-              ],
+            SafeArea(
+              child: ListView(
+                children: <Widget>[
+                  _buildNavigation(context),
+                  _buildTitle(title: plant.name),
+                  _buildContent(plant),
+                ],
+              ),
             ),
           ],
         ),
@@ -53,24 +49,18 @@ class PlantsDetailsPage extends StatelessWidget {
     }));
   }
 
-  Expanded _buildContent(Plant plant) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.only(top: 30.0, left: 30.0, right: 30.0),
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0))),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _buildHeader(
-                date: plant.daysLeft, frequency: plant.frequency.round()),
-            _buildDescription(description: plant.description),
-          ],
-        ),
+  Container _buildContent(Plant plant) {
+    return Container(
+      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(topRight: Radius.circular(50.0))),
+      child: Column(
+        children: <Widget>[
+          _buildHeader(
+              date: plant.daysLeft, frequency: plant.frequency.round()),
+          _buildDescription(description: plant.description),
+        ],
       ),
     );
   }
@@ -129,7 +119,9 @@ class PlantsDetailsPage extends StatelessWidget {
 
   Container _buildTitle({String title = ''}) {
     return Container(
-      margin: EdgeInsets.all(30.0),
+      height: 200.0,
+      alignment: AlignmentDirectional.centerStart,
+      margin: EdgeInsets.all(20.0),
       child: Text(
         title,
         style: TextStyle(
@@ -147,13 +139,21 @@ class PlantsDetailsPage extends StatelessWidget {
             children: <Widget>[
               Text(
                 'Next watering in',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                style: TextStyle(fontWeight: FontWeight.w100, fontSize: 18.0),
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text('$date days',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0)),
+                child: Row(
+                  children: <Widget>[
+                    Text('$date',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 40.0,
+                            color: mainGreen)),
+                    Text(' Days',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 40.0)),
+                  ],
+                ),
               ),
               Text('Watering every $frequency days',
                   style: TextStyle(color: blueyColor, fontSize: 15.0)),
@@ -161,11 +161,23 @@ class PlantsDetailsPage extends StatelessWidget {
           ),
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 25.0),
+          padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 35.0),
           decoration: BoxDecoration(
-              color: greenyColor, borderRadius: BorderRadius.circular(20.0)),
+              color: mainGreen,
+              boxShadow: [
+                BoxShadow(
+                    color: Color.fromRGBO(51, 51, 51, 0.2),
+                    offset: Offset(4.0, 4.0),
+                    spreadRadius: 1.0,
+                    blurRadius: 5.0)
+              ],
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30.0),
+                  topLeft: Radius.circular(10.0),
+                  bottomRight: Radius.circular(10.0),
+                  bottomLeft: Radius.circular(30.0))),
           child: Image.asset(
-            'assets/drop-icon--white-outline.png',
+            'assets/drop-logo--outline.png',
             width: 40.0,
           ),
         )
@@ -173,34 +185,38 @@ class PlantsDetailsPage extends StatelessWidget {
     );
   }
 
-  Expanded _buildDescription({description: 'Lorem Ipsum'}) {
-    return Expanded(
-        child: Container(
+  Container _buildDescription({description: 'Lorem Ipsum'}) {
+    return Container(
       margin: EdgeInsets.symmetric(vertical: 20.0),
-      height: 70.0,
-      child: ListView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Watering infos',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Text(
+              'Watering infos',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+            ),
           ),
-          Divider(),
           Text(description),
           Divider(),
-          Text(
-            'Plants infos',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Text(
+              'Plants infos',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+            ),
           ),
           _buildTable(),
         ],
       ),
-    ));
+    );
   }
 
-  Table _buildTable() {
+  Container _buildTable() {
     Padding _buildHead({String text, double padding = 10.0, TextStyle style}) {
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 15.0),
+        padding: EdgeInsets.symmetric(vertical: 5.0),
         child: Text(
           text,
           style: style,
@@ -210,30 +226,40 @@ class PlantsDetailsPage extends StatelessWidget {
 
     Padding _buildCells({String text, double padding = 10.0, TextStyle style}) {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+        padding: EdgeInsets.symmetric(vertical: 5.0),
         child: Text(text, style: style),
       );
     }
 
-    return Table(
-      children: [
-        TableRow(children: [
-          _buildHead(text: 'Temperature', style: TextStyle(color: blueyColor)),
-          _buildHead(text: 'Humidiy', style: TextStyle(color: blueyColor)),
-          _buildHead(text: 'Light', style: TextStyle(color: blueyColor)),
-        ]),
-        TableRow(
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: blueyColor,
-                ),
-                borderRadius: BorderRadius.circular(10.0)),
-            children: [
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(color: fadedGreen, width: 5.0)),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildHead(
+                    text: 'Temperature', style: TextStyle(color: blueyColor)),
+                _buildHead(
+                    text: 'Humidiy', style: TextStyle(color: blueyColor)),
+                _buildHead(text: 'Light', style: TextStyle(color: blueyColor)),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
               _buildCells(text: '18-28 °C', style: tableTextStyle),
               _buildCells(text: '70-75 %', style: tableTextStyle),
               _buildCells(text: '5k to 10k lux', style: tableTextStyle),
-            ])
-      ],
+            ],
+          )
+        ],
+      ),
     );
   }
 }
