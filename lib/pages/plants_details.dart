@@ -4,16 +4,28 @@ import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/plants.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class PlantsDetailsPage extends StatelessWidget {
+class PlantsDetailsPage extends StatefulWidget {
   final int plantIndex;
+  bool editMode;
+  double frequency = 1.0;
 
+  PlantsDetailsPage(this.plantIndex, {this.editMode: true});
+
+  @override
+  PlantsDetailsPageState createState() {
+    return new PlantsDetailsPageState();
+  }
+}
+
+class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
+
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
+
   final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
+
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
-
-  PlantsDetailsPage(this.plantIndex);
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +34,14 @@ class PlantsDetailsPage extends StatelessWidget {
       return Future.value(false);
     }, child: ScopedModelDescendant<PlantsModel>(
         builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
-      Plant plant = model.plants[plantIndex];
+      Plant plant = model.plants[widget.plantIndex];
       return Scaffold(
         body: Stack(
           children: <Widget>[
             Container(
-              height: 400.0,
+              height: widget.editMode ? 700.0 : 400.0,
               child: Hero(
-                tag: 'plantImg-$plantIndex',
+                tag: 'plantImg-${widget.plantIndex}',
                 child: GradientImageBackground(
                     imgURL: plant.imgURL, color: Colors.black87),
               ),
@@ -50,19 +62,78 @@ class PlantsDetailsPage extends StatelessWidget {
   }
 
   Container _buildContent(Plant plant) {
-    return Container(
-      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(50.0))),
-      child: Column(
-        children: <Widget>[
-          _buildHeader(
-              date: plant.daysLeft, frequency: plant.frequency.round()),
-          _buildDescription(description: plant.description),
-        ],
-      ),
+    Column content = Column(
+      children: <Widget>[
+        _buildHeader(date: plant.daysLeft, frequency: plant.frequency.round()),
+        _buildDescription(description: plant.description),
+      ],
     );
+
+    if (widget.editMode) {
+      content = Column(
+        children: <Widget>[
+          _buildFrequencyInput(frequency: plant.frequency.round()),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Container(
+                  width: 150.0,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(51, 51, 51, 0.1),
+                          offset: Offset(4.0, 4.0),
+                          spreadRadius: 1.0,
+                          blurRadius: 5.0)
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: FlatButton(
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+                Container(
+                  width: 150.0,
+                  decoration: BoxDecoration(
+                    color: mainGreen,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(51, 51, 51, 0.1),
+                          offset: Offset(4.0, 4.0),
+                          spreadRadius: 1.0,
+                          blurRadius: 5.0)
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: FlatButton(
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      );
+    }
+    return Container(
+        padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topRight: Radius.circular(50.0))),
+        child: content);
   }
 
   Padding _buildNavigation(BuildContext context) {
@@ -82,7 +153,11 @@ class PlantsDetailsPage extends StatelessWidget {
                     icon: Icon(Icons.edit),
                     color: Colors.white,
                     iconSize: 30.0,
-                    onPressed: () => print('Edit Mode')),
+                    onPressed: () {
+                      setState(() {
+                        widget.editMode = !widget.editMode;
+                      });
+                    }),
                 IconButton(
                     icon: Icon(Icons.delete_outline),
                     color: Colors.white,
@@ -119,13 +194,69 @@ class PlantsDetailsPage extends StatelessWidget {
 
   Container _buildTitle({String title = ''}) {
     return Container(
-      height: 200.0,
+      height: widget.editMode ? 350.0 : 200.0,
       alignment: AlignmentDirectional.centerStart,
       margin: EdgeInsets.all(20.0),
       child: Text(
         title,
         style: TextStyle(
             color: Colors.white, fontSize: 45.0, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Container _buildFrequencyInput({int frequency}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 30.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Watering Frequency'),
+                ),
+                Slider(
+                  label: 'Watering Frequency',
+                  activeColor: mainGreen,
+                  inactiveColor: fadedGreen,
+                  onChanged: (double value) {
+                    setState(() {
+                      widget.frequency = value.roundToDouble();
+                    });
+                  },
+                  value: widget.frequency,
+                  max: 30.0,
+                  min: 1.0,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              decoration: BoxDecoration(
+                  color: mainGreen,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25.0),
+                      topRight: Radius.circular(10.0),
+                      bottomLeft: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0))),
+              child: Center(
+                child: Text(
+                  widget.frequency.round().toString(),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 35.0,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -245,7 +376,7 @@ class PlantsDetailsPage extends StatelessWidget {
                 _buildHead(
                     text: 'Temperature', style: TextStyle(color: blueyColor)),
                 _buildHead(
-                    text: 'Humidiy', style: TextStyle(color: blueyColor)),
+                    text: 'Humidity', style: TextStyle(color: blueyColor)),
                 _buildHead(text: 'Light', style: TextStyle(color: blueyColor)),
               ],
             ),

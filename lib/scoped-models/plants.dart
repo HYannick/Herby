@@ -63,4 +63,8 @@ class PlantsModel extends Model {
   void deletePlant(int index) {
     _plants.removeAt(index);
   }
+
+  void editPlant(int index) {
+    ;
+  }
 }
