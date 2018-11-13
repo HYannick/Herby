@@ -34,7 +34,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
       return Future.value(false);
     }, child: ScopedModelDescendant<MainModel>(
         builder: (BuildContext scopedContext, Widget child, MainModel model) {
-      Plant plant = model.plants[widget.plantIndex];
+      Plant plant = model.allPlants[widget.plantIndex];
       return Scaffold(
         body: Stack(
           children: <Widget>[
@@ -350,12 +350,14 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                     }
 
                     Plant updatedPlant = Plant(
+                        id: plant.id,
                         daysLeft: daysLeft,
                         frequency: widget.frequency.round(),
                         description: plant.description,
                         lastWatering: plant.lastWatering,
                         name: plant.name,
-                        imgURL: plant.imgURL);
+                        imgURL: plant.imgURL,
+                        userId: plant.userId);
                     editPlant(updatedPlant, widget.plantIndex);
                     setState(() {
                       widget.editMode = false;

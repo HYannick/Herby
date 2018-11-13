@@ -18,14 +18,15 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: MainModel(),
+      model: model,
       child: MaterialApp(
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,
           routes: {
             '/': (BuildContext context) => AuthPage(),
-            '/home': (BuildContext context) => HomePage(),
+            '/home': (BuildContext context) => HomePage(model),
             '/plant-create': (BuildContext context) => PlantCreatePage()
           },
           onGenerateRoute: (RouteSettings settings) {
@@ -42,7 +43,7 @@ class MyAppState extends State<MyApp> {
           },
           onUnknownRoute: (RouteSettings settings) {
             return MaterialPageRoute(
-                builder: (BuildContext context) => HomePage());
+                builder: (BuildContext context) => HomePage(model));
           }),
     );
   }

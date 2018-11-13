@@ -5,9 +5,11 @@ import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/pages/plant_search.dart';
 import 'package:herby_app/pages/profile.dart';
 import 'package:herby_app/plants_list.dart';
+import 'package:herby_app/scoped-models/main.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage();
+  MainModel model;
+  HomePage(this.model);
 
   @override
   HomePageState createState() {
@@ -153,5 +155,11 @@ class HomePageState extends State<HomePage> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    widget.model.fetchPlants();
+    super.initState();
   }
 }

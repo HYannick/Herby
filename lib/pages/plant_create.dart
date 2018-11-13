@@ -98,25 +98,31 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext scopedContext, Widget child, MainModel model) {
       return Container(
-        width: 170.0,
-        decoration: BoxDecoration(
-          color: mainGreen,
-          borderRadius: BorderRadius.circular(15.0),
-          boxShadow: [
-            BoxShadow(
-                color: Color.fromRGBO(51, 51, 51, 0.1),
-                offset: Offset(4.0, 4.0),
-                spreadRadius: 1.0,
-                blurRadius: 5.0)
-          ],
-        ),
-        child: FlatButton(
-            child: Text(
-              'Add Plant',
-              style: TextStyle(color: Colors.white, fontSize: 16.0),
-            ),
-            onPressed: () => _submitPlant(model.addPlant, model.plants)),
-      );
+          width: 170.0,
+          decoration: BoxDecoration(
+            color: mainGreen,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                  color: Color.fromRGBO(51, 51, 51, 0.1),
+                  offset: Offset(4.0, 4.0),
+                  spreadRadius: 1.0,
+                  blurRadius: 5.0)
+            ],
+          ),
+          child: !model.isLoading
+              ? FlatButton(
+                  child: Text(
+                    'Add Plant',
+                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  ),
+                  onPressed: () =>
+                      _submitPlant(model.addPlant, model.allPlants))
+              : Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  )));
     });
   }
 
@@ -139,14 +145,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
     _formKey.currentState.save();
 
-    addPlant(Plant(
-        frequency: plantForm['frequency'],
-        imgURL: plantForm['imgURL'],
-        lastWatering: plantForm['lastWatering'],
-        daysLeft: plantForm['daysLeft'],
-        description: plantForm['description'],
-        name: plantForm['name']));
-    Navigator.pushReplacementNamed(context, '/home');
+    addPlant(plantForm)
+        .then((_) => Navigator.pushReplacementNamed(context, '/home'));
   }
 
   Column _buildWateringDatePicker() {

@@ -96,6 +96,7 @@ class Plants extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Expanded(child: _buildTitle(plant)),
+        Text(plant.userId),
         Container(
           alignment: Alignment.topCenter,
           child: Image.asset(
@@ -107,17 +108,22 @@ class Plants extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantList(List<Plant> plants, Function deletePlant) {
+  Widget _buildPlantList(
+      List<Plant> plants, Function deletePlant, bool isLoading) {
     Widget plantList = Center(
         child: Text(
       'Empty! Add some plants :D',
       style: TextStyle(fontSize: 15.0),
     ));
-    if (plants.length > 0) {
+    if (plants.length > 0 && !isLoading) {
       plantList = ListView.builder(
         itemBuilder: (BuildContext context, int index) =>
             _buildPlantItem(context, index, plants, deletePlant),
         itemCount: plants.length,
+      );
+    } else if (isLoading) {
+      plantList = Center(
+        child: CircularProgressIndicator(),
       );
     }
     return plantList;
@@ -127,7 +133,8 @@ class Plants extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext scopedContext, Widget child, MainModel model) {
-      return _buildPlantList(model.plants, model.deletePlant);
+      return _buildPlantList(
+          model.allPlants, model.deletePlant, model.isLoading);
     });
   }
 }
