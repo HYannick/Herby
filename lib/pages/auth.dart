@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
+import 'package:herby_app/scoped-models/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -11,12 +13,13 @@ class AuthPage extends StatefulWidget {
 
 class AuthPageState extends State<AuthPage> {
   Map<String, String> loginForm = {'email': '', 'password': ''};
-  Map<String, String> RegisterForm = {
+  Map<String, String> registerForm = {
     'username': '',
     'email': '',
     'password': '',
     'passwordConfirm': ''
   };
+  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
   bool registerMode = false;
 
@@ -85,41 +88,42 @@ class AuthPageState extends State<AuthPage> {
                   fontSize: 16.0)),
         ),
         Container(
-          margin: EdgeInsets.symmetric(vertical: 20.0),
-          width: 200.0,
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.15),
-                offset: Offset(0.0, 3.0),
-                spreadRadius: 6.0,
-                blurRadius: 10.0)
-          ], color: mainGreen, borderRadius: BorderRadius.circular(50.0)),
-          child: FlatButton(
-            child: Text(!registerMode ? 'Login' : 'Register',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0)),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
-            },
-          ),
-        ),
+            margin: EdgeInsets.symmetric(vertical: 20.0),
+            width: 200.0,
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.15),
+                  offset: Offset(0.0, 3.0),
+                  spreadRadius: 6.0,
+                  blurRadius: 10.0)
+            ], color: mainGreen, borderRadius: BorderRadius.circular(50.0)),
+            child: ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
+                return FlatButton(
+                    child: Text(!registerMode ? 'Login' : 'Register',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0)),
+                    onPressed: () => _submitForm(model.login));
+              },
+            )),
       ],
     );
   }
 
   Form _buildLogin() {
     return Form(
+        key: _loginKey,
         child: Column(
-      children: <Widget>[
-        _buildTextFormField(TextInputType.emailAddress, 'email', 'Email',
-            minChar: 2),
-        Divider(),
-        _buildTextFormField(TextInputType.text, 'password', 'Password',
-            minChar: 2, hidden: true)
-      ],
-    ));
+          children: <Widget>[
+            _buildTextFormField(TextInputType.emailAddress, 'email', 'Email',
+                minChar: 2),
+            Divider(),
+            _buildTextFormField(TextInputType.text, 'password', 'Password',
+                minChar: 2, hidden: true)
+          ],
+        ));
   }
 
   Form _buildRegister() {
@@ -170,5 +174,14 @@ class AuthPageState extends State<AuthPage> {
           },
           onSaved: (String value) => loginForm[field] = value),
     );
+  }
+
+  _submitForm(Function login) {
+    if (!_loginKey.currentState.validate()) {
+      return;
+    }
+    _loginKey.currentState.save();
+    login(loginForm['email'], loginForm['password']);
+    Navigator.pushReplacementNamed(context, '/home');
   }
 }

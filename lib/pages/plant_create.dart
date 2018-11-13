@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:herby_app/components/date_time_picker.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
-import 'package:herby_app/scoped-models/plants.dart';
+import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class PlantCreatePage extends StatefulWidget {
@@ -95,8 +95,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
   }
 
   ScopedModelDescendant _buildSubmitButton() {
-    return ScopedModelDescendant<PlantsModel>(
-        builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext scopedContext, Widget child, MainModel model) {
       return Container(
         width: 170.0,
         decoration: BoxDecoration(
@@ -121,11 +121,13 @@ class PlantCreatePageState extends State<PlantCreatePage> {
   }
 
   void _submitPlant(Function addPlant, List<Plant> plants) {
-    if (!_formKey.currentState.validate() ||
-        plantForm['lastWatering'] == null) {
+    if (!_formKey.currentState.validate()) {
       return;
     }
     plantForm['frequency'] = frequency.round();
+    if (plantForm['lastWatering'] == null) {
+      plantForm['lastWatering'] = DateTime.now();
+    }
     plantForm['daysLeft'] = plantForm['lastWatering']
             .add(Duration(days: plantForm['frequency']))
             .day -
@@ -134,7 +136,9 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     if (plantForm['daysLeft'] < 0) {
       plantForm['daysLeft'] = 0;
     }
+
     _formKey.currentState.save();
+
     addPlant(Plant(
         frequency: plantForm['frequency'],
         imgURL: plantForm['imgURL'],
@@ -142,6 +146,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
         daysLeft: plantForm['daysLeft'],
         description: plantForm['description'],
         name: plantForm['name']));
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   Column _buildWateringDatePicker() {

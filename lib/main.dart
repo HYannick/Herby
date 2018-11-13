@@ -3,7 +3,7 @@ import 'package:herby_app/pages/auth.dart';
 import 'package:herby_app/pages/home.dart';
 import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/plants_details.dart';
-import 'package:herby_app/scoped-models/plants.dart';
+import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 main() => runApp(MyApp());
@@ -18,8 +18,8 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<PlantsModel>(
-      model: PlantsModel(),
+    return ScopedModel<MainModel>(
+      model: MainModel(),
       child: MaterialApp(
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,

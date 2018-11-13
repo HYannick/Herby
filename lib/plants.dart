@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/models/plant.dart';
-import 'package:herby_app/scoped-models/plants.dart';
+import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Plants extends StatelessWidget {
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-  Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants) {
+  Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants,
+      Function deletePlant) {
     return GestureDetector(
       onTap: () => Navigator.of(context)
               .pushNamed<bool>('/plant/${index.toString()}')
               .then((bool value) {
-            if (value) {}
+            if (value) {
+              deletePlant(index);
+            }
           }),
       child: Card(
         color: Colors.transparent,
@@ -104,7 +107,7 @@ class Plants extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantList(List<Plant> plants) {
+  Widget _buildPlantList(List<Plant> plants, Function deletePlant) {
     Widget plantList = Center(
         child: Text(
       'Empty! Add some plants :D',
@@ -113,7 +116,7 @@ class Plants extends StatelessWidget {
     if (plants.length > 0) {
       plantList = ListView.builder(
         itemBuilder: (BuildContext context, int index) =>
-            _buildPlantItem(context, index, plants),
+            _buildPlantItem(context, index, plants, deletePlant),
         itemCount: plants.length,
       );
     }
@@ -122,9 +125,9 @@ class Plants extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<PlantsModel>(
-        builder: (BuildContext scopedContext, Widget child, PlantsModel model) {
-      return _buildPlantList(model.plants);
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext scopedContext, Widget child, MainModel model) {
+      return _buildPlantList(model.plants, model.deletePlant);
     });
   }
 }
