@@ -13,15 +13,49 @@ mixin UsersModel on ConnectedPlantsModel {
   }
 }
 
+dynamic customEncode(dynamic item) {
+  if (item is DateTime) {
+    return item.toIso8601String();
+  }
+  return item;
+}
+
 mixin PlantsModel on ConnectedPlantsModel {
   List<Plant> get allPlants => List.from(_plants);
 
-  void deletePlant(int index) {
-    _plants.removeAt(index);
+  void deletePlant(Plant plant int index) {
+  _isLoading = true;
+  notifyListeners();
+    http
+      .delete('https://herby-47c7c.firebaseio.com/plants/${plant.id}.json')
+      .then((http.Response res) {
+          _plants.removeAt(index);
+          _isLoading = false;
+          notifyListeners();
+      });
   }
 
-  void editPlant(Plant plant, int index) {
-    _plants[index] = plant;
+  Future<Null> editPlant(Map<String, dynamic> plantObj, int index) {
+    _isLoading = true;
+    notifyListeners();
+    return http
+        .put('https://herby-47c7c.firebaseio.com/plants/${plantObj['id']}.json',
+            body: json.encode(plantObj, toEncodable: customEncode))
+        .then((http.Response res) {
+      final Plant plant = Plant(
+        id: plantObj['id'],
+        imgURL: plantObj['imgURL'],
+        name: plantObj['name'],
+        lastWatering: plantObj['lastWatering'],
+        frequency: plantObj['frequency'],
+        daysLeft: plantObj['daysLeft'],
+        userId: plantObj['userId'],
+        description: plantObj['description'],
+      );
+      _plants[index] = plant;
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   void fetchPlants() {
@@ -71,12 +105,6 @@ mixin ConnectedPlantsModel on Model {
   Future<Null> addPlant(Map<String, dynamic> plantForm) {
     _isLoading = true;
     notifyListeners();
-    dynamic customEncode(dynamic item) {
-      if (item is DateTime) {
-        return item.toIso8601String();
-      }
-      return item;
-    }
 
     Map<String, dynamic> userId = {'userId': _authenticatedUser.id};
     plantForm.addAll(userId);

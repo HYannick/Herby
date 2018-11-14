@@ -51,7 +51,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 children: <Widget>[
                   _buildNavigation(context),
                   _buildTitle(title: plant.name),
-                  _buildContent(plant, model.editPlant),
+                  _buildContent(plant, model.editPlant, model.isLoading),
                 ],
               ),
             ),
@@ -61,7 +61,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
     }));
   }
 
-  Container _buildContent(Plant plant, Function editPlant) {
+  Container _buildContent(Plant plant, Function editPlant, bool isLoading) {
     Column content = Column(
       children: <Widget>[
         _buildHeader(date: plant.daysLeft, frequency: plant.frequency.round()),
@@ -70,7 +70,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
     );
 
     if (widget.editMode) {
-      content = _buildEditMode(plant, editPlant);
+      content = _buildEditMode(plant, editPlant, isLoading);
     }
 
     return Container(
@@ -285,7 +285,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   }
 
   // Edit Mode
-  Column _buildEditMode(Plant plant, Function editPlant) {
+  Column _buildEditMode(Plant plant, Function editPlant, bool isLoading) {
     return Column(
       children: <Widget>[
         _buildFrequencyInput(frequency: plant.frequency.round()),
@@ -335,10 +335,16 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: FlatButton(
-                  child: Text(
-                    'Save',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: isLoading
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ))
+                      : Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white),
+                        ),
                   onPressed: () {
                     int daysLeft = plant.lastWatering
                             .add(Duration(days: widget.frequency.round()))
@@ -349,18 +355,20 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                       daysLeft = 0;
                     }
 
-                    Plant updatedPlant = Plant(
-                        id: plant.id,
-                        daysLeft: daysLeft,
-                        frequency: widget.frequency.round(),
-                        description: plant.description,
-                        lastWatering: plant.lastWatering,
-                        name: plant.name,
-                        imgURL: plant.imgURL,
-                        userId: plant.userId);
-                    editPlant(updatedPlant, widget.plantIndex);
-                    setState(() {
-                      widget.editMode = false;
+                    Map<String, dynamic> updatedPlant = {
+                      'id': plant.id,
+                      'daysLeft': daysLeft,
+                      'frequency': widget.frequency.round(),
+                      'description': plant.description,
+                      'lastWatering': plant.lastWatering,
+                      'name': plant.name,
+                      'imgURL': plant.imgURL,
+                      'userId': plant.userId
+                    };
+                    editPlant(updatedPlant, widget.plantIndex).then((_) {
+                      setState(() {
+                        widget.editMode = false;
+                      });
                     });
                   },
                 ),

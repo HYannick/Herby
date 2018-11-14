@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 class Plants extends StatelessWidget {
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
+
   Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants,
       Function deletePlant) {
     return GestureDetector(
@@ -12,7 +13,7 @@ class Plants extends StatelessWidget {
               .pushNamed<bool>('/plant/${index.toString()}')
               .then((bool value) {
             if (value) {
-              deletePlant(index);
+              deletePlant(plants[index], index);
             }
           }),
       child: Card(
@@ -54,8 +55,13 @@ class Plants extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        child: Image.asset(
-                          plants[index].imgURL,
+                        child: FadeInImage(
+                          height: 130.0,
+                          placeholder:
+                              AssetImage('assets/drop-logo--outline.png'),
+                          image: AssetImage(
+                            plants[index].imgURL,
+                          ),
                           fit: BoxFit.cover,
                         )),
                   ),
