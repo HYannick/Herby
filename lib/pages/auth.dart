@@ -19,7 +19,11 @@ class AuthPageState extends State<AuthPage> {
     'password': '',
     'passwordConfirm': ''
   };
+
   final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
+
+  final TextEditingController _passwordController = TextEditingController();
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
   bool registerMode = false;
 
@@ -128,22 +132,23 @@ class AuthPageState extends State<AuthPage> {
 
   Form _buildRegister() {
     return Form(
+        key: _registerKey,
         child: Column(
-      children: <Widget>[
-        _buildTextFormField(TextInputType.text, 'username', 'Username',
-            minChar: 2, hidden: true),
-        Divider(),
-        _buildTextFormField(TextInputType.emailAddress, 'email', 'Email',
-            minChar: 2),
-        Divider(),
-        _buildTextFormField(TextInputType.text, 'password', 'Password',
-            minChar: 2, hidden: true),
-        Divider(),
-        _buildTextFormField(
-            TextInputType.text, 'password_confirm', 'Confirm Password',
-            minChar: 2, hidden: true)
-      ],
-    ));
+          children: <Widget>[
+            _buildTextFormField(TextInputType.text, 'username', 'Username',
+                minChar: 2, hidden: true),
+            Divider(),
+            _buildTextFormField(TextInputType.emailAddress, 'email', 'Email',
+                minChar: 2),
+            Divider(),
+            _buildTextFormField(TextInputType.text, 'password', 'Password',
+                minChar: 2, hidden: true, controller: _passwordController),
+            Divider(),
+            _buildTextFormField(
+                TextInputType.text, 'password_confirm', 'Confirm Password',
+                minChar: 2, hidden: true)
+          ],
+        ));
   }
 
   Container _buildLogo() {
@@ -158,12 +163,13 @@ class AuthPageState extends State<AuthPage> {
 
   Padding _buildTextFormField(
       TextInputType keyboardType, String field, String label,
-      {int minChar, bool hidden = false}) {
+      {int minChar, bool hidden = false, TextEditingController controller}) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: TextFormField(
           keyboardType: keyboardType,
           obscureText: hidden,
+          controller: controller,
           maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
           decoration: InputDecoration.collapsed(
               hintText: label, hintStyle: TextStyle(color: Colors.black38)),
@@ -171,17 +177,31 @@ class AuthPageState extends State<AuthPage> {
             if (value.isEmpty || value.length <= minChar) {
               return '$label is required and should be $minChar+ characters long.';
             }
+            if (field == 'password_confirm') {
+              if (controller.text != value) {
+                return 'Passwords doesn\'t match.';
+              }
+            }
           },
           onSaved: (String value) => loginForm[field] = value),
     );
   }
 
   _submitForm(Function login) {
-    if (!_loginKey.currentState.validate()) {
+    if (!registerMode) {
+      if (!_loginKey.currentState.validate()) {
+        return;
+      }
+      _loginKey.currentState.save();
+      login(loginForm['email'], loginForm['password']);
+      Navigator.pushReplacementNamed(context, '/home');
       return;
     }
-    _loginKey.currentState.save();
-    login(loginForm['email'], loginForm['password']);
+    if (!_registerKey.currentState.validate()) {
+      return;
+    }
+    _registerKey.currentState.save();
+//    register(registerForm['email'], registerForm['password'], registerForm['username']);
     Navigator.pushReplacementNamed(context, '/home');
   }
 }

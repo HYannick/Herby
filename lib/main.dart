@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:herby_app/pages/auth.dart';
 import 'package:herby_app/pages/home.dart';
 import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/plants_details.dart';
@@ -24,7 +25,7 @@ class MyAppState extends State<MyApp> {
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (BuildContext context) => HomePage(model), //AuthPage(),
+            '/': (BuildContext context) => AuthPage(),
             '/home': (BuildContext context) => HomePage(model),
             '/plant-create': (BuildContext context) => PlantCreatePage()
           },

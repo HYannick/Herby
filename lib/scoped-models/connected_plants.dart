@@ -27,7 +27,7 @@ mixin ConnectedPlantsModel on Model {
     });
   }
 
-  Future<Null> addPlant(Map<String, dynamic> plantForm) {
+  Future<bool> addPlant(Map<String, dynamic> plantForm) {
     _isLoading = true;
     notifyListeners();
 
@@ -51,6 +51,11 @@ mixin ConnectedPlantsModel on Model {
       _plants.add(plant);
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 }
@@ -77,27 +82,32 @@ mixin PlantsModel on ConnectedPlantsModel {
     notifyListeners();
   }
 
-  void deletePlant(Plant plant) {
+  Future<bool> deletePlant(Plant plant) async {
     _isLoading = true;
     selectPlant(plant.id);
     notifyListeners();
-    http
-        .delete('https://herby-47c7c.firebaseio.com/plants/${plant.id}.json')
-        .then((http.Response res) {
+    try {
+      await http
+          .delete('https://herby-47c7c.firebaseio.com/plants/${plant.id}.json');
       _plants.removeAt(selectedPlantIndex);
       _isLoading = false;
       _selectedPlantId = null;
       notifyListeners();
-    });
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
-  Future<Null> editPlant(Map<String, dynamic> plantObj) {
+  Future<bool> editPlant(Map<String, dynamic> plantObj) async {
     _isLoading = true;
     notifyListeners();
-    return http
-        .put('https://herby-47c7c.firebaseio.com/plants/$selectedPlantId.json',
-            body: json.encode(plantObj, toEncodable: customEncode))
-        .then((http.Response res) {
+    try {
+      await http.put(
+          'https://herby-47c7c.firebaseio.com/plants/$selectedPlantId.json',
+          body: json.encode(plantObj, toEncodable: customEncode));
       final Plant plant = Plant(
         id: plantObj['id'],
         imgURL: plantObj['imgURL'],
@@ -111,22 +121,28 @@ mixin PlantsModel on ConnectedPlantsModel {
       _plants[selectedPlantIndex] = plant;
       _isLoading = false;
       notifyListeners();
-    });
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
-  void fetchPlants() {
+  Future<Null> fetchPlants() async {
     _isLoading = true;
     notifyListeners();
-    http
-        .get('https://herby-47c7c.firebaseio.com/plants.json')
-        .then((http.Response res) {
+    try {
+      final http.Response res =
+          await http.get('https://herby-47c7c.firebaseio.com/plants.json');
+
       final List<Plant> fetchedPlantsList = [];
       final Map<String, dynamic> plants = json.decode(res.body);
 
       if (plants == null) {
         _isLoading = false;
         notifyListeners();
-        return;
+        return null;
       }
 
       plants.forEach((String plantId, dynamic plantData) {
@@ -145,7 +161,11 @@ mixin PlantsModel on ConnectedPlantsModel {
       _plants = fetchedPlantsList;
       _isLoading = false;
       notifyListeners();
-    });
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
   }
 }
 
