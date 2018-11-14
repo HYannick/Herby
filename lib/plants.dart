@@ -6,14 +6,14 @@ import 'package:scoped_model/scoped_model.dart';
 class Plants extends StatelessWidget {
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
 
-  Widget _buildPlantItem(BuildContext context, int index, List<Plant> plants,
-      Function deletePlant) {
+  Widget _buildPlantItem(
+      BuildContext context, int index, Plant plant, Function deletePlant) {
     return GestureDetector(
       onTap: () => Navigator.of(context)
-              .pushNamed<bool>('/plant/${index.toString()}')
+              .pushNamed<bool>('/plant/${plant.id.toString()}')
               .then((bool value) {
             if (value) {
-              deletePlant(plants[index], index);
+              deletePlant(plant);
             }
           }),
       child: Card(
@@ -29,7 +29,7 @@ class Plants extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     Text(
-                      '${plants[index].daysLeft}',
+                      '${plant.daysLeft}',
                       style: TextStyle(
                           fontWeight: FontWeight.w100,
                           fontSize: 50.0,
@@ -48,7 +48,7 @@ class Plants extends StatelessWidget {
               Expanded(
                 child: Stack(children: <Widget>[
                   Hero(
-                    tag: 'plantImg-$index',
+                    tag: 'plantImg-${plant.id}',
                     child: Container(
                         constraints: BoxConstraints.expand(height: 130.0),
                         height: 130.0,
@@ -60,7 +60,7 @@ class Plants extends StatelessWidget {
                           placeholder:
                               AssetImage('assets/drop-logo--outline.png'),
                           image: AssetImage(
-                            plants[index].imgURL,
+                            plant.imgURL,
                           ),
                           fit: BoxFit.cover,
                         )),
@@ -77,7 +77,7 @@ class Plants extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(15.0),
-                    child: _buildDescription(context, plants[index], index),
+                    child: _buildDescription(plant),
                   )
                 ]),
               ),
@@ -88,21 +88,17 @@ class Plants extends StatelessWidget {
     );
   }
 
-  Text _buildTitle(Plant plant) {
-    return Text(
-      plant.name,
-      style: TextStyle(
-          color: mainGreen, fontWeight: FontWeight.bold, fontSize: 16.0),
-    );
-  }
-
-  Row _buildDescription(BuildContext context, Plant plant, int index) {
+  Row _buildDescription(Plant plant) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Expanded(child: _buildTitle(plant)),
-        Text(plant.userId),
+        Expanded(
+            child: Text(
+          plant.name,
+          style: TextStyle(
+              color: mainGreen, fontWeight: FontWeight.bold, fontSize: 16.0),
+        )),
         Container(
           alignment: Alignment.topCenter,
           child: Image.asset(
@@ -121,10 +117,13 @@ class Plants extends StatelessWidget {
       'Empty! Add some plants :D',
       style: TextStyle(fontSize: 15.0),
     ));
+
     if (plants.length > 0 && !isLoading) {
       plantList = ListView.builder(
-        itemBuilder: (BuildContext context, int index) =>
-            _buildPlantItem(context, index, plants, deletePlant),
+        itemBuilder: (BuildContext context, int index) {
+          Plant plant = plants[index];
+          return _buildPlantItem(context, index, plant, deletePlant);
+        },
         itemCount: plants.length,
       );
     } else if (isLoading) {

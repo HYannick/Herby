@@ -5,11 +5,11 @@ import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class PlantsDetailsPage extends StatefulWidget {
-  final int plantIndex;
+  final String plantId;
   bool editMode;
   double frequency = 1.0;
 
-  PlantsDetailsPage(this.plantIndex, {this.editMode: false});
+  PlantsDetailsPage(this.plantId, {this.editMode: false});
 
   @override
   PlantsDetailsPageState createState() {
@@ -19,11 +19,8 @@ class PlantsDetailsPage extends StatefulWidget {
 
 class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
-
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-
   final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
-
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
 
@@ -34,14 +31,15 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
       return Future.value(false);
     }, child: ScopedModelDescendant<MainModel>(
         builder: (BuildContext scopedContext, Widget child, MainModel model) {
-      Plant plant = model.allPlants[widget.plantIndex];
+      model.selectPlant(widget.plantId);
+      Plant plant = model.selectedPlant;
       return Scaffold(
         body: Stack(
           children: <Widget>[
             Container(
               height: widget.editMode ? 700.0 : 400.0,
               child: Hero(
-                tag: 'plantImg-${widget.plantIndex}',
+                tag: 'plantImg-${plant.id}',
                 child: GradientImageBackground(
                     imgURL: plant.imgURL, color: Colors.black87),
               ),
@@ -51,7 +49,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 children: <Widget>[
                   _buildNavigation(context),
                   _buildTitle(title: plant.name),
-                  _buildContent(plant, model.editPlant, model.isLoading),
+                  _buildContent(plant)
                 ],
               ),
             ),
@@ -61,7 +59,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
     }));
   }
 
-  Container _buildContent(Plant plant, Function editPlant, bool isLoading) {
+  Container _buildContent(Plant plant) {
     Column content = Column(
       children: <Widget>[
         _buildHeader(date: plant.daysLeft, frequency: plant.frequency.round()),
@@ -70,7 +68,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
     );
 
     if (widget.editMode) {
-      content = _buildEditMode(plant, editPlant, isLoading);
+      content = _buildEditMode(plant);
     }
 
     return Container(
@@ -140,7 +138,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   // Display Mode
   Container _buildTitle({String title = ''}) {
     return Container(
-      height: widget.editMode ? 350.0 : 200.0,
+      height: widget.editMode ? 250.0 : 100.0,
       alignment: AlignmentDirectional.centerStart,
       margin: EdgeInsets.all(20.0),
       child: Text(
@@ -285,7 +283,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   }
 
   // Edit Mode
-  Column _buildEditMode(Plant plant, Function editPlant, bool isLoading) {
+  Column _buildEditMode(Plant plant) {
     return Column(
       children: <Widget>[
         _buildFrequencyInput(frequency: plant.frequency.round()),
@@ -321,58 +319,63 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 ),
               ),
               Container(
-                width: 150.0,
-                decoration: BoxDecoration(
-                  color: mainGreen,
-                  borderRadius: BorderRadius.circular(15.0),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(51, 51, 51, 0.1),
-                        offset: Offset(4.0, 4.0),
-                        spreadRadius: 1.0,
-                        blurRadius: 5.0)
-                  ],
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: FlatButton(
-                  child: isLoading
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ))
-                      : Text(
-                          'Save',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                  onPressed: () {
-                    int daysLeft = plant.lastWatering
-                            .add(Duration(days: widget.frequency.round()))
-                            .day -
-                        DateTime.now().day;
+                  width: 150.0,
+                  decoration: BoxDecoration(
+                    color: mainGreen,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(51, 51, 51, 0.1),
+                          offset: Offset(4.0, 4.0),
+                          spreadRadius: 1.0,
+                          blurRadius: 5.0)
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ScopedModelDescendant<MainModel>(builder:
+                      (BuildContext scopedContext, Widget child,
+                          MainModel model) {
+                    return FlatButton(
+                      child: model.isLoading
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ))
+                          : Text(
+                              'Save',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                      onPressed: () {
+                        int daysLeft = plant.lastWatering
+                                .add(Duration(days: widget.frequency.round()))
+                                .day -
+                            DateTime.now().day;
 
-                    if (daysLeft < 0) {
-                      daysLeft = 0;
-                    }
+                        if (daysLeft < 0) {
+                          daysLeft = 0;
+                        }
 
-                    Map<String, dynamic> updatedPlant = {
-                      'id': plant.id,
-                      'daysLeft': daysLeft,
-                      'frequency': widget.frequency.round(),
-                      'description': plant.description,
-                      'lastWatering': plant.lastWatering,
-                      'name': plant.name,
-                      'imgURL': plant.imgURL,
-                      'userId': plant.userId
-                    };
-                    editPlant(updatedPlant, widget.plantIndex).then((_) {
-                      setState(() {
-                        widget.editMode = false;
-                      });
-                    });
-                  },
-                ),
-              )
+                        Map<String, dynamic> updatedPlant = {
+                          'id': plant.id,
+                          'daysLeft': daysLeft,
+                          'frequency': widget.frequency.round(),
+                          'description': plant.description,
+                          'lastWatering': plant.lastWatering,
+                          'name': plant.name,
+                          'imgURL': plant.imgURL,
+                          'userId': plant.userId
+                        };
+                        model.selectPlant(plant.id);
+                        model.editPlant(updatedPlant).then((_) {
+                          setState(() {
+                            widget.editMode = false;
+                          });
+                        });
+                      },
+                    );
+                  }))
             ],
           ),
         )

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:herby_app/pages/auth.dart';
 import 'package:herby_app/pages/home.dart';
 import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/plants_details.dart';
@@ -25,7 +24,7 @@ class MyAppState extends State<MyApp> {
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (BuildContext context) => AuthPage(),
+            '/': (BuildContext context) => HomePage(model), //AuthPage(),
             '/home': (BuildContext context) => HomePage(model),
             '/plant-create': (BuildContext context) => PlantCreatePage()
           },
@@ -35,9 +34,10 @@ class MyAppState extends State<MyApp> {
               return null;
             }
             if (pathElements[1].startsWith('plant')) {
-              final int index = int.parse(pathElements[2]);
+              final String plantId = pathElements[2];
               return MaterialPageRoute<bool>(
-                  builder: (BuildContext context) => PlantsDetailsPage(index));
+                  builder: (BuildContext context) =>
+                      PlantsDetailsPage(plantId));
             }
             return null;
           },
