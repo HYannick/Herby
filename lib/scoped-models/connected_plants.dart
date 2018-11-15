@@ -61,9 +61,64 @@ mixin ConnectedPlantsModel on Model {
 }
 
 mixin UsersModel on ConnectedPlantsModel {
-  void login(String email, String password) {
-    _authenticatedUser =
-        User(id: 'daoeufnemzvz3', email: email, password: password);
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> userInfos = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true
+    };
+    final http.Response res = await http.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=[AIzaSyBuiIHY'
+        '-DL_6B2KtqlkvDGfENqpPvfbM10',
+        body: userInfos,
+        headers: {'Content-Type': 'application/json'});
+    final Map<String, dynamic> resData = jsonDecode(res.body);
+    bool hasError = true;
+    String message = 'Something went wrong :(';
+    if (resData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Authentication succeded';
+    } else if (resData['error']['message'] == 'EMAIL_EXISTS') {
+      hasError = true;
+      message = 'This email already exists.';
+    }
+    _isLoading = false;
+    notifyListeners();
+    return {'success': !hasError, 'message': message};
+//    _authenticatedUser =
+//        User(id: 'daoeufnemzvz3', email: email, password: password);
+  }
+
+  Future<Map<String, dynamic>> signup(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> userInfos = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true
+    };
+
+    final http.Response res = await http.post(
+        'https://www.googleapis'
+        '.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBuiIHY'
+        '-DL_6B2KtqlkvDGfENqpPvfbM10',
+        body: jsonEncode(userInfos),
+        headers: {'Content-Type': 'application/json'});
+    final Map<String, dynamic> resData = jsonDecode(res.body);
+    bool hasError = true;
+    String message = 'Something went wrong :(';
+    if (resData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Authentication succeded';
+    } else if (resData['error']['message'] == 'EMAIL_EXISTS') {
+      hasError = true;
+      message = 'This email already exists.';
+    }
+    _isLoading = false;
+    notifyListeners();
+    return {'success': !hasError, 'message': message};
   }
 }
 
