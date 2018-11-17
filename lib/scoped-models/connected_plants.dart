@@ -5,6 +5,7 @@ import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 mixin ConnectedPlantsModel on Model {
   List<Plant> _plants = [];
@@ -18,13 +19,14 @@ mixin ConnectedPlantsModel on Model {
       _plants.indexWhere((Plant plant) => plant.id == _selectedPlantId);
 
   Plant get selectedPlant {
-    if (selectedPlantId == null) {
+    if (_selectedPlantId == null) {
       return null;
     }
 
-    return _plants.firstWhere((Plant plant) {
-      return plant.id == _selectedPlantId;
-    });
+    print(_plants);
+    print(_selectedPlantId);
+    return _plants.firstWhere((Plant plant) => plant.id == _selectedPlantId,
+        orElse: null);
   }
 
   Future<bool> addPlant(Map<String, dynamic> plantForm) {
@@ -35,7 +37,8 @@ mixin ConnectedPlantsModel on Model {
     plantForm.addAll(userId);
 
     return http
-        .post('https://herby-47c7c.firebaseio.com/plants.json',
+        .post(
+            'https://herby-47c7c.firebaseio.com/plants.json?auth=${_authenticatedUser.token}',
             body: json.encode(plantForm, toEncodable: customEncode))
         .then((http.Response res) {
       final Map<String, dynamic> responseData = json.decode(res.body);
@@ -61,64 +64,76 @@ mixin ConnectedPlantsModel on Model {
 }
 
 mixin UsersModel on ConnectedPlantsModel {
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> userInfos = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true
-    };
-    final http.Response res = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=[AIzaSyBuiIHY'
-        '-DL_6B2KtqlkvDGfENqpPvfbM10',
-        body: userInfos,
-        headers: {'Content-Type': 'application/json'});
-    final Map<String, dynamic> resData = jsonDecode(res.body);
-    bool hasError = true;
-    String message = 'Something went wrong :(';
-    if (resData.containsKey('idToken')) {
-      hasError = false;
-      message = 'Authentication succeded';
-    } else if (resData['error']['message'] == 'EMAIL_EXISTS') {
-      hasError = true;
-      message = 'This email already exists.';
-    }
-    _isLoading = false;
-    notifyListeners();
-    return {'success': !hasError, 'message': message};
-//    _authenticatedUser =
-//        User(id: 'daoeufnemzvz3', email: email, password: password);
+  User get user {
+    return _authenticatedUser;
   }
 
-  Future<Map<String, dynamic>> signup(String email, String password) async {
+  Future<Map<String, dynamic>> authenticate(
+      String email, String password, bool registerMode) async {
     _isLoading = true;
     notifyListeners();
+
     final Map<String, dynamic> userInfos = {
       'email': email,
       'password': password,
       'returnSecureToken': true
     };
 
-    final http.Response res = await http.post(
-        'https://www.googleapis'
-        '.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBuiIHY'
-        '-DL_6B2KtqlkvDGfENqpPvfbM10',
-        body: jsonEncode(userInfos),
-        headers: {'Content-Type': 'application/json'});
+    http.Response res;
+
+    if (registerMode) {
+      res = await http.post(
+          'https://www.googleapis'
+          '.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBuiIHY'
+          '-DL_6B2KtqlkvDGfENqpPvfbM10',
+          body: jsonEncode(userInfos),
+          headers: {'Content-Type': 'application/json'});
+    } else {
+      res = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBuiIHY-DL_6B2KtqlkvDGfENqpPvfbM10',
+          body: jsonEncode(userInfos),
+          headers: {'Content-Type': 'application/json'});
+    }
+
     final Map<String, dynamic> resData = jsonDecode(res.body);
     bool hasError = true;
     String message = 'Something went wrong :(';
+
     if (resData.containsKey('idToken')) {
       hasError = false;
       message = 'Authentication succeded';
+      _authenticatedUser =
+          User(id: resData['localId'], email: email, token: resData['idToken']);
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', resData['idToken']);
+      prefs.setString('userId', resData['localId']);
+      prefs.setString('userEmail', email);
+    } else if (resData['error']['message'] == 'EMAIL_NOT_FOUND') {
+      hasError = true;
+      message = 'This email was not found.';
+    } else if (resData['error']['message'] == 'INVALID_PASSWORD') {
+      hasError = true;
+      message = 'The password is invalid';
     } else if (resData['error']['message'] == 'EMAIL_EXISTS') {
       hasError = true;
       message = 'This email already exists.';
     }
+
     _isLoading = false;
     notifyListeners();
     return {'success': !hasError, 'message': message};
+  }
+
+  void autoAuth() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('token');
+
+    if (token != null) {
+      final String userID = prefs.getString('userId');
+      final String userEmail = prefs.getString('userEmail');
+      _authenticatedUser = User(id: userID, email: userEmail, token: token);
+      notifyListeners();
+    }
   }
 }
 
@@ -134,7 +149,6 @@ mixin PlantsModel on ConnectedPlantsModel {
 
   void selectPlant(String plantId) {
     _selectedPlantId = plantId;
-    notifyListeners();
   }
 
   Future<bool> deletePlant(Plant plant) async {
@@ -142,8 +156,8 @@ mixin PlantsModel on ConnectedPlantsModel {
     selectPlant(plant.id);
     notifyListeners();
     try {
-      await http
-          .delete('https://herby-47c7c.firebaseio.com/plants/${plant.id}.json');
+      await http.delete(
+          'https://herby-47c7c.firebaseio.com/plants/${plant.id}.json?auth=${_authenticatedUser.token}');
       _plants.removeAt(selectedPlantIndex);
       _isLoading = false;
       _selectedPlantId = null;
@@ -161,7 +175,7 @@ mixin PlantsModel on ConnectedPlantsModel {
     notifyListeners();
     try {
       await http.put(
-          'https://herby-47c7c.firebaseio.com/plants/$selectedPlantId.json',
+          'https://herby-47c7c.firebaseio.com/plants/$selectedPlantId.json?auth=${_authenticatedUser.token}',
           body: json.encode(plantObj, toEncodable: customEncode));
       final Plant plant = Plant(
         id: plantObj['id'],
@@ -188,8 +202,8 @@ mixin PlantsModel on ConnectedPlantsModel {
     _isLoading = true;
     notifyListeners();
     try {
-      final http.Response res =
-          await http.get('https://herby-47c7c.firebaseio.com/plants.json');
+      final http.Response res = await http.get(
+          'https://herby-47c7c.firebaseio.com/plants.json?auth=${_authenticatedUser.token}');
 
       final List<Plant> fetchedPlantsList = [];
       final Map<String, dynamic> plants = json.decode(res.body);

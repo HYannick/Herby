@@ -5,13 +5,13 @@ class User {
   final String username;
   final String avatarURL;
   final String email;
-  final String password;
+  final String token;
 
   User({
     @required this.id,
     this.username,
     this.avatarURL,
     @required this.email,
-    @required this.password,
+    @required this.token,
   });
 }

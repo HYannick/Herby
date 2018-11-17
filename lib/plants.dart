@@ -51,7 +51,6 @@ class Plants extends StatelessWidget {
                     tag: 'plantImg-${plant.id}',
                     child: Container(
                         constraints: BoxConstraints.expand(height: 130.0),
-                        height: 130.0,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5.0),
                         ),

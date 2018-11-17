@@ -31,43 +31,43 @@ class AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-          body: Stack(children: <Widget>[
-            GradientImageBackground(
-                imgURL: 'assets/auth_background@2x.png',
-                color: Color.fromRGBO(51, 51, 51, 1.0),
-                fadeColor: Color.fromRGBO(219, 237, 145, 0.30),
-                gradientOpacity: 0.6),
+      body: Stack(children: <Widget>[
+        GradientImageBackground(
+            imgURL: 'assets/auth_background@2x.png',
+            color: Color.fromRGBO(51, 51, 51, 1.0),
+            fadeColor: Color.fromRGBO(219, 237, 145, 0.30),
+            gradientOpacity: 0.6),
+        Container(
+          constraints: BoxConstraints.expand(),
+          child: ListView(children: <Widget>[
+            _buildLogo(),
             Container(
-              constraints: BoxConstraints.expand(),
-              child: ListView(children: <Widget>[
-                _buildLogo(),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 30.0),
-                  padding: EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Color.fromRGBO(61, 50, 25, 0.4),
-                            offset: Offset(10.0, 6.0),
-                            spreadRadius: 6.0,
-                            blurRadius: 10.0)
-                      ],
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(25.0),
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(10.0))),
-                  child: !registerMode ? _buildLogin() : _buildRegister(),
-                ),
-                SizedBox(
-                  height: 30.0,
-                ),
-                _buildLoginButton(context),
-              ]),
-            )
+              margin: EdgeInsets.symmetric(horizontal: 30.0),
+              padding: EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(61, 50, 25, 0.4),
+                        offset: Offset(10.0, 6.0),
+                        spreadRadius: 6.0,
+                        blurRadius: 10.0)
+                  ],
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      topRight: Radius.circular(25.0),
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(10.0))),
+              child: !registerMode ? _buildLogin() : _buildRegister(),
+            ),
+            SizedBox(
+              height: 30.0,
+            ),
+            _buildLoginButton(context),
           ]),
-        ));
+        )
+      ]),
+    ));
   }
 
   Column _buildLoginButton(BuildContext context) {
@@ -91,30 +91,38 @@ class AuthPageState extends State<AuthPage> {
                   fontWeight: FontWeight.bold,
                   fontSize: 16.0)),
         ),
-        Container(
-            margin: EdgeInsets.symmetric(vertical: 20.0),
-            width: 200.0,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.15),
-                  offset: Offset(0.0, 3.0),
-                  spreadRadius: 6.0,
-                  blurRadius: 10.0)
-            ], color: mainGreen, borderRadius: BorderRadius.circular(50.0)),
-            child: ScopedModelDescendant<MainModel>(
-              builder: (BuildContext context, Widget child, MainModel model) {
-                return model.isLoading ? Padding(padding: EdgeInsets.all(8.0),child: Center
-                  (child:
-                CircularProgressIndicator(),))
-                    :FlatButton(
-                    child: Text(!registerMode ? 'Login' : 'Register',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0)),
-                    onPressed: () => _submitForm(model.login, model.signup));
-              },
-            )),
+        ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
+          return model.isLoading
+              ? Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ))
+              : Container(
+                  margin: EdgeInsets.symmetric(vertical: 20.0),
+                  width: 200.0,
+                  decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 0.15),
+                            offset: Offset(0.0, 3.0),
+                            spreadRadius: 6.0,
+                            blurRadius: 10.0)
+                      ],
+                      color: mainGreen,
+                      borderRadius: BorderRadius.circular(50.0)),
+                  child: FlatButton(
+                      child: Text(!registerMode ? 'Login' : 'Register',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0)),
+                      onPressed: () => _submitForm(
+                          model.authenticate,
+                          registerMode ? _registerKey : _loginKey,
+                          registerMode ? registerForm : loginForm)));
+        }),
       ],
     );
   }
@@ -124,12 +132,12 @@ class AuthPageState extends State<AuthPage> {
         key: _loginKey,
         child: Column(
           children: <Widget>[
-            _buildTextFormField(loginForm, TextInputType.emailAddress, 'email'
-                , 'Email',
+            _buildTextFormField(
+                loginForm, TextInputType.emailAddress, 'email', 'Email',
                 minChar: 2),
             Divider(),
-            _buildTextFormField(loginForm, TextInputType.text, 'password', 'Pas'
-                'sword',
+            _buildTextFormField(
+                loginForm, TextInputType.text, 'password', 'Password',
                 minChar: 2, hidden: true)
           ],
         ));
@@ -140,21 +148,20 @@ class AuthPageState extends State<AuthPage> {
         key: _registerKey,
         child: Column(
           children: <Widget>[
-            _buildTextFormField(registerForm, TextInputType.text, 'username',
-                'Username',
+            _buildTextFormField(
+                registerForm, TextInputType.text, 'username', 'Username',
                 minChar: 2),
             Divider(),
-            _buildTextFormField(registerForm, TextInputType.emailAddress, 'ema'
-                'il', 'Email',
+            _buildTextFormField(
+                registerForm, TextInputType.emailAddress, 'email', 'Email',
                 minChar: 2),
             Divider(),
-            _buildTextFormField(registerForm, TextInputType.text, 'password', ''
-                'Passwo'
-                'rd',
+            _buildTextFormField(
+                registerForm, TextInputType.text, 'password', 'Password',
                 minChar: 2, hidden: true, controller: _passwordController),
             Divider(),
-            _buildTextFormField(registerForm,
-                TextInputType.text, 'password_confirm', 'Confirm Password',
+            _buildTextFormField(registerForm, TextInputType.text,
+                'password_confirm', 'Confirm Password',
                 minChar: 2, hidden: true, controller: _passwordController)
           ],
         ));
@@ -165,100 +172,79 @@ class AuthPageState extends State<AuthPage> {
         height: 300.0,
         child: Center(
             child: SvgPicture.asset(
-              'assets/drop-logo--plain.svg',
-              color: Colors.white,
-            )));
+          'assets/drop-logo--plain.svg',
+          color: Colors.white,
+        )));
   }
 
-  Padding _buildTextFormField
+  Padding _buildTextFormField(
+      Map formType, TextInputType keyboardType, String field, String label,
+      {int minChar, bool hidden = false, TextEditingController controller}) {
+    TextFormField textField = TextFormField(
+        keyboardType: keyboardType,
+        obscureText: hidden,
+        maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
+        decoration: InputDecoration.collapsed(
+            hintText: label, hintStyle: TextStyle(color: Colors.black38)),
+        validator: (String value) {
+          if (value.isEmpty || value.length <= minChar) {
+            return '$label is required and should be $minChar+ characters long.';
+          }
+          if (field == 'password_confirm' && controller.text != value) {
+            return 'Passwords doesn\'t match.';
+          }
+        },
+        onSaved: (String value) => formType[field] = value);
 
-  (
-
-  Map formType
-
-  TextInputType keyboardType, String
-
-  field
-
-  ,
-
-  String label
-
-  ,
-
-  {int minChar, bool hidden = false, TextEditingController controller
-  }
-
-  )
-
-  {
-  TextFormField textField = TextFormField(
-  keyboardType: keyboardType,
-  obscureText: hidden,
-  maxLines: keyboardType == TextInputType.multiline ? 4 : 1,
-  decoration: InputDecoration.collapsed(
-  hintText: label, hintStyle: TextStyle(color: Colors.black38)),
-  validator: (String value) {
-  if (value.isEmpty || value.length <= minChar) {
-  return '$label is required and should be $minChar+ characters long.';
-  }
-  if (field == 'password_confirm' && controller.text != value) {
-  return 'Passwords doesn\'t match.';
-  }
-  },
-  onSaved: (String value) => formType[field] = value);
-
-  if (field == 'password') {
-  textField = TextFormField(
-  keyboardType: keyboardType,
-  obscureText: hidden,
-  controller: controller,
-  decoration: InputDecoration.collapsed(
-  hintText: label, hintStyle: TextStyle(color: Colors.black38)),
-  validator: (String value) {
-  if (value.isEmpty || value.length <= minChar) {
-  return '$label is required and should be $minChar+ characters long.';
-  }
-  },
-  onSaved: (String value) => formType[field] = value);
-  }
-
-  return Padding(padding: const EdgeInsets.all(5.0), child: textField);
-  }
-
-  _submitForm(Function login, Function signup) async {
-    if (!registerMode) {
-      if (!_loginKey.currentState.validate()) {
-        return;
-      }
-      _loginKey.currentState.save();
-      login(loginForm['email'], loginForm['password']);
-      Navigator.pushReplacementNamed(context, '/home');
-      return;
+    if (field == 'password') {
+      textField = TextFormField(
+          keyboardType: keyboardType,
+          obscureText: hidden,
+          controller: controller,
+          decoration: InputDecoration.collapsed(
+              hintText: label, hintStyle: TextStyle(color: Colors.black38)),
+          validator: (String value) {
+            if (value.isEmpty || value.length <= minChar) {
+              return '$label is required and should be $minChar+ characters long.';
+            }
+          },
+          onSaved: (String value) => formType[field] = value);
     }
 
-    if (!_registerKey.currentState.validate()) {
+    return Padding(padding: const EdgeInsets.all(5.0), child: textField);
+  }
+
+  _submitForm(
+      Function authenticate, GlobalKey<FormState> formKey, Map form) async {
+    Map<String, dynamic> res;
+    if (!formKey.currentState.validate()) {
       return;
     }
-    _registerKey.currentState.save();
-    final Map<String, dynamic> res =
-    await signup(registerForm['email'], registerForm['password']);
-    print(res['success']);
+    formKey.currentState.save();
+    res = await authenticate(form['email'], form['password'], registerMode);
     if (res['success']) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
-      showDialog(context: context, builder: (BuildContext context) {
-        return AlertDialog(title: Text('Oups.'), content: Text
-          (res['message']),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Okay'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],);
-      });
+      _showAuthDialog(res);
     }
+  }
+
+  Future _showAuthDialog(Map<String, dynamic> res) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Oups.'),
+            content: Text(res['message']),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 }

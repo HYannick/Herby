@@ -62,7 +62,11 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   Container _buildContent(Plant plant) {
     Column content = Column(
       children: <Widget>[
-        _buildHeader(date: plant.daysLeft, frequency: plant.frequency.round()),
+        Transform.translate(
+          child: _buildHeader(
+              date: plant.daysLeft, frequency: plant.frequency.round()),
+          offset: Offset(0.0, -50.0),
+        ),
         _buildDescription(description: plant.description),
       ],
     );

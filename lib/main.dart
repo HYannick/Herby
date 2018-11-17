@@ -16,17 +16,28 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  MainModel _model;
+  @override
+  void initState() {
+    _model = MainModel();
+    _model.autoAuth();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: model,
+      model: _model,
       child: MaterialApp(
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (BuildContext context) => AuthPage(),
-            '/home': (BuildContext context) => HomePage(model),
+            '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
+                    builder:
+                        (BuildContext context, Widget child, MainModel model) {
+                  return _model.user == null ? AuthPage() : HomePage(_model);
+                }),
+            '/home': (BuildContext context) => HomePage(_model),
             '/plant-create': (BuildContext context) => PlantCreatePage()
           },
           onGenerateRoute: (RouteSettings settings) {
@@ -44,7 +55,7 @@ class MyAppState extends State<MyApp> {
           },
           onUnknownRoute: (RouteSettings settings) {
             return MaterialPageRoute(
-                builder: (BuildContext context) => HomePage(model));
+                builder: (BuildContext context) => HomePage(_model));
           }),
     );
   }
