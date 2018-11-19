@@ -17,12 +17,21 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   MainModel _model;
+  bool _isAuthenticated = false;
+
   @override
   void initState() {
     _model = MainModel();
     _model.autoAuth();
+    _model.userSubject.listen((bool isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
     super.initState();
   }
+
+  Widget checkAuth(Widget widget) => !_isAuthenticated ? AuthPage() : widget;
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +41,15 @@ class MyAppState extends State<MyApp> {
           theme: ThemeData(fontFamily: 'Nunito'),
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
-                    builder:
-                        (BuildContext context, Widget child, MainModel model) {
-                  return _model.user == null ? AuthPage() : HomePage(_model);
-                }),
-            '/home': (BuildContext context) => HomePage(_model),
-            '/plant-create': (BuildContext context) => PlantCreatePage()
+            '/': (BuildContext context) => checkAuth(HomePage(_model)),
+            '/plant-create': (BuildContext context) =>
+                checkAuth(PlantCreatePage())
           },
           onGenerateRoute: (RouteSettings settings) {
+            if (!_isAuthenticated) {
+              return MaterialPageRoute<bool>(
+                  builder: (BuildContext context) => AuthPage());
+            }
             final List<String> pathElements = settings.name.split('/');
             if (pathElements[0] != '') {
               return null;
@@ -49,13 +58,13 @@ class MyAppState extends State<MyApp> {
               final String plantId = pathElements[2];
               return MaterialPageRoute<bool>(
                   builder: (BuildContext context) =>
-                      PlantsDetailsPage(plantId));
+                      checkAuth(PlantsDetailsPage(plantId)));
             }
             return null;
           },
           onUnknownRoute: (RouteSettings settings) {
             return MaterialPageRoute(
-                builder: (BuildContext context) => HomePage(_model));
+                builder: (BuildContext context) => checkAuth(HomePage(_model)));
           }),
     );
   }

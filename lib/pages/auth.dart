@@ -223,7 +223,7 @@ class AuthPageState extends State<AuthPage> {
     formKey.currentState.save();
     res = await authenticate(form['email'], form['password'], registerMode);
     if (res['success']) {
-      Navigator.pushReplacementNamed(context, '/home');
+//      Navigator.pushReplacementNamed(context, '/');
     } else {
       _showAuthDialog(res);
     }

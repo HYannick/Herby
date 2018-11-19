@@ -37,14 +37,17 @@ class PlantCreatePageState extends State<PlantCreatePage> {
         },
         child: Stack(
           children: <Widget>[
-            Container(
-              height: 400.0,
-              child: GradientImageBackground(
-                  imgURL: 'assets/Dracena Marginata.jpg',
-                  color: Color.fromRGBO(219, 237, 145, 1.0),
-                  fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
-                  gradientOpacity: 0.50),
-            ),
+            ScopedModelDescendant<MainModel>(
+                builder: (BuildContext context, Widget child, model) {
+              return Container(
+                height: 400.0,
+                child: GradientImageBackground(
+                    imageFile: model.imageURL,
+                    color: Color.fromRGBO(219, 237, 145, 1.0),
+                    fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
+                    gradientOpacity: 0.50),
+              );
+            }),
             ListView(
               children: <Widget>[
                 _buildTitle(),
@@ -147,7 +150,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
     addPlant(plantForm).then((bool success) {
       if (success) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/');
       } else {
         showDialog(
             context: context,

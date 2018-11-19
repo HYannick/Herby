@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class GradientImageBackground extends StatelessWidget {
@@ -7,6 +9,7 @@ class GradientImageBackground extends StatelessWidget {
   final double opacity;
   final double gradientOpacity;
   final bool enableGradient;
+  final File imageFile;
 
   GradientImageBackground(
       {this.imgURL = '',
@@ -14,7 +17,8 @@ class GradientImageBackground extends StatelessWidget {
       this.color = Colors.black87,
       this.opacity = 1.0,
       this.fadeColor = Colors.transparent,
-      this.gradientOpacity = 1.0});
+      this.gradientOpacity = 1.0,
+      this.imageFile});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +28,19 @@ class GradientImageBackground extends StatelessWidget {
         opacity: opacity,
         child: Stack(
           children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                image: ExactAssetImage(imgURL),
-                fit: BoxFit.cover,
-              )),
-            ),
+            imageFile == null
+                ? Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                      image: ExactAssetImage(imgURL),
+                      fit: BoxFit.cover,
+                    )),
+                  )
+                : Image.file(
+                    imageFile,
+                    fit: BoxFit.cover,
+                    height: 500.0,
+                  ),
             enableGradient
                 ? Opacity(
                     opacity: gradientOpacity,

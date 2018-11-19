@@ -1,30 +1,36 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/models/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:rxdart/subjects.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 mixin ConnectedPlantsModel on Model {
   List<Plant> _plants = [];
   User _authenticatedUser;
+  File _imageURL;
   bool _isLoading = false;
   String _selectedPlantId;
 
   String get selectedPlantId => _selectedPlantId;
+  File get imageURL => _imageURL;
 
   int get selectedPlantIndex =>
       _plants.indexWhere((Plant plant) => plant.id == _selectedPlantId);
+
+  void pickImage(File image) {
+    _imageURL = image;
+  }
 
   Plant get selectedPlant {
     if (_selectedPlantId == null) {
       return null;
     }
 
-    print(_plants);
-    print(_selectedPlantId);
     return _plants.firstWhere((Plant plant) => plant.id == _selectedPlantId,
         orElse: null);
   }
@@ -64,9 +70,10 @@ mixin ConnectedPlantsModel on Model {
 }
 
 mixin UsersModel on ConnectedPlantsModel {
-  User get user {
-    return _authenticatedUser;
-  }
+  Timer _authTimer;
+  PublishSubject<bool> _userSubject = PublishSubject();
+  User get user => _authenticatedUser;
+  PublishSubject<bool> get userSubject => _userSubject;
 
   Future<Map<String, dynamic>> authenticate(
       String email, String password, bool registerMode) async {
@@ -104,10 +111,16 @@ mixin UsersModel on ConnectedPlantsModel {
       message = 'Authentication succeded';
       _authenticatedUser =
           User(id: resData['localId'], email: email, token: resData['idToken']);
+      setAuthTimeout(int.parse(resData['expiresIn']));
+      _userSubject.add(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final DateTime now = DateTime.now();
+      final DateTime expiryTime =
+          now.add(Duration(seconds: int.parse(resData['expiresIn'])));
       prefs.setString('token', resData['idToken']);
       prefs.setString('userId', resData['localId']);
       prefs.setString('userEmail', email);
+      prefs.setString('expiryTime', expiryTime.toIso8601String());
     } else if (resData['error']['message'] == 'EMAIL_NOT_FOUND') {
       hasError = true;
       message = 'This email was not found.';
@@ -124,14 +137,42 @@ mixin UsersModel on ConnectedPlantsModel {
     return {'success': !hasError, 'message': message};
   }
 
+  void logout() async {
+    _authenticatedUser = null;
+    _authTimer.cancel();
+    _userSubject.add(false);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+    prefs.remove('userEmail');
+    prefs.remove('userId');
+  }
+
+  void setAuthTimeout(int time) {
+    _authTimer = Timer(Duration(seconds: time), logout);
+  }
+
   void autoAuth() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String token = prefs.getString('token');
+    final String expiryTimeString = prefs.getString('expiryTime');
 
     if (token != null) {
+      final DateTime now = DateTime.now();
+      final parsedExpiryTime = DateTime.parse(expiryTimeString);
+
+      if (parsedExpiryTime.isBefore(now)) {
+        _authenticatedUser = null;
+        _userSubject.add(false);
+        notifyListeners();
+        return;
+      }
+
       final String userID = prefs.getString('userId');
       final String userEmail = prefs.getString('userEmail');
+      final int tokenLifeSpan = parsedExpiryTime.difference(now).inSeconds;
       _authenticatedUser = User(id: userID, email: userEmail, token: token);
+      _userSubject.add(true);
+      setAuthTimeout(tokenLifeSpan);
       notifyListeners();
     }
   }

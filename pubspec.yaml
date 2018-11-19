@@ -25,6 +25,8 @@ dependencies:
   intl: ^0.15.7
   scoped_model: ^0.3.0
   shared_preferences: ^0.4.3
+  rxdart: ^0.19.0
+  image_picker: ^0.4.10
 
 dev_dependencies:
   flutter_test:
