@@ -15,7 +15,7 @@ class ImageInput extends StatefulWidget {
 
 class ImageInputState extends State<ImageInput> {
   void _getImage(BuildContext context, ImageSource src, Function pickImage) {
-    ImagePicker.pickImage(source: src, maxWidth: 400.0).then((File image) {
+    ImagePicker.pickImage(source: src, maxWidth: 800.0).then((File image) {
       pickImage(image);
       Navigator.pushNamed(context, '/plant-create');
     });
