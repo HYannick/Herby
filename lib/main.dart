@@ -35,6 +35,7 @@ class MyAppState extends State<MyApp> {
   void initState() {
     _model = MainModel();
     _model.autoAuth();
+    _model.getCameras(cameras);
     _model.userSubject.listen((bool isAuthenticated) {
       setState(() {
         _isAuthenticated = isAuthenticated;
@@ -55,7 +56,7 @@ class MyAppState extends State<MyApp> {
           routes: {
             '/': (BuildContext context) => checkAuth(HomePage(_model)),
             '/plant-create': (BuildContext context) =>
-                checkAuth(PlantCreatePage(cameras))
+                checkAuth(PlantCreatePage())
           },
           onGenerateRoute: (RouteSettings settings) {
             if (!_isAuthenticated) {

@@ -3,12 +3,11 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:herby_app/scoped-models/main.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class CameraInput extends StatefulWidget {
-  final List<CameraDescription> cameras;
-  CameraInput(this.cameras);
-
   @override
   _CameraInputState createState() {
     return _CameraInputState();
@@ -58,7 +57,11 @@ class _CameraInputState extends State<CameraInput> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                _cameraTogglesRowWidget(),
+                ScopedModelDescendant<MainModel>(builder:
+                    (BuildContext scopedContext, Widget child,
+                        MainModel model) {
+                  return _cameraTogglesRowWidget(model.cameras);
+                }),
                 _thumbnailWidget(),
               ],
             ),
@@ -123,13 +126,13 @@ class _CameraInputState extends State<CameraInput> {
   }
 
   /// Display a row of toggle to select the camera (or a message if no camera is available).
-  Widget _cameraTogglesRowWidget() {
+  Widget _cameraTogglesRowWidget(List<CameraDescription> cameras) {
     final List<Widget> toggles = <Widget>[];
 
-    if (widget.cameras.isEmpty) {
+    if (cameras.isEmpty) {
       return const Text('No camera found');
     } else {
-      for (CameraDescription cameraDescription in widget.cameras) {
+      for (CameraDescription cameraDescription in cameras) {
         toggles.add(
           SizedBox(
             width: 90.0,

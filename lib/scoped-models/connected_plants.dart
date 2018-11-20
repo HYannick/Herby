@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/models/user.dart';
 import 'package:http/http.dart' as http;
@@ -13,17 +14,25 @@ mixin ConnectedPlantsModel on Model {
   List<Plant> _plants = [];
   User _authenticatedUser;
   File _imageURL;
+  List<CameraDescription> _cameras;
   bool _isLoading = false;
   String _selectedPlantId;
 
   String get selectedPlantId => _selectedPlantId;
+
   File get imageURL => _imageURL;
+
+  List<CameraDescription> get cameras => _cameras;
 
   int get selectedPlantIndex =>
       _plants.indexWhere((Plant plant) => plant.id == _selectedPlantId);
 
   void pickImage(File image) {
     _imageURL = image;
+  }
+
+  void getCameras(List<CameraDescription> cams) {
+    _cameras = cams;
   }
 
   Plant get selectedPlant {
@@ -72,7 +81,9 @@ mixin ConnectedPlantsModel on Model {
 mixin UsersModel on ConnectedPlantsModel {
   Timer _authTimer;
   PublishSubject<bool> _userSubject = PublishSubject();
+
   User get user => _authenticatedUser;
+
   PublishSubject<bool> get userSubject => _userSubject;
 
   Future<Map<String, dynamic>> authenticate(
