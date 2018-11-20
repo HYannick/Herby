@@ -36,10 +36,12 @@ class GradientImageBackground extends StatelessWidget {
                       fit: BoxFit.cover,
                     )),
                   )
-                : Image.file(
-                    imageFile,
-                    fit: BoxFit.cover,
-                    height: 500.0,
+                : Container(
+                    constraints: BoxConstraints.expand(height: 400.0),
+                    child: Image.file(
+                      imageFile,
+                      fit: BoxFit.cover,
+                    ),
                   ),
             enableGradient
                 ? Opacity(

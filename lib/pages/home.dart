@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:herby_app/components/ImageInput.dart';
 import 'package:herby_app/components/custom_notched_shapes.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/pages/plant_search.dart';
@@ -54,21 +53,21 @@ class HomePageState extends State<HomePage> {
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _currentIndex == 1
-          ? ImageInput()
+          ? FloatingActionButton(
+              elevation: 5.0,
+              backgroundColor: Colors.white,
+              child: SvgPicture.asset('assets/photo-icon--outline.svg'),
+              onPressed: () => Navigator.of(context).pushNamed('/plant-create'),
+            )
           : FloatingActionButton(
               elevation: 5.0,
               backgroundColor: Colors.white,
-              child: _currentIndex == 1
-                  ? SvgPicture.asset('assets/photo-icon--outline.svg')
-                  : Icon(
-                      Icons.add,
-                      size: 45.0,
-                      color: Color.fromRGBO(140, 216, 207, 1.0),
-                    ),
+              child: Icon(
+                Icons.add,
+                size: 45.0,
+                color: Color.fromRGBO(140, 216, 207, 1.0),
+              ),
               onPressed: () {
-                if (_currentIndex == 1) {
-//            return Navigator.pushNamed(context, '/plant-create');
-                }
                 setState(() {
                   _currentIndex = 1;
                 });

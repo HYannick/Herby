@@ -17,6 +17,7 @@ class ImageInputState extends State<ImageInput> {
   void _getImage(BuildContext context, ImageSource src, Function pickImage) {
     ImagePicker.pickImage(source: src, maxWidth: 800.0).then((File image) {
       pickImage(image);
+      Navigator.of(context).pop();
       Navigator.pushNamed(context, '/plant-create');
     });
   }

@@ -1,4 +1,6 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:herby_app/components/CameraInput.dart';
 import 'package:herby_app/pages/auth.dart';
 import 'package:herby_app/pages/home.dart';
 import 'package:herby_app/pages/plant_create.dart';
@@ -6,7 +8,17 @@ import 'package:herby_app/pages/plants_details.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-main() => runApp(MyApp());
+List<CameraDescription> cameras;
+
+Future<Null> main() async {
+  // Fetch the available cameras before initializing the app.
+  try {
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    logError(e.code, e.description);
+  }
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -43,7 +55,7 @@ class MyAppState extends State<MyApp> {
           routes: {
             '/': (BuildContext context) => checkAuth(HomePage(_model)),
             '/plant-create': (BuildContext context) =>
-                checkAuth(PlantCreatePage())
+                checkAuth(PlantCreatePage(cameras))
           },
           onGenerateRoute: (RouteSettings settings) {
             if (!_isAuthenticated) {

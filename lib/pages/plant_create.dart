@@ -1,12 +1,14 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:herby_app/components/CameraInput.dart';
 import 'package:herby_app/components/date_time_picker.dart';
-import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class PlantCreatePage extends StatefulWidget {
-  PlantCreatePage();
+  final List<CameraDescription> cameras;
+  PlantCreatePage(this.cameras);
 
   @override
   PlantCreatePageState createState() {
@@ -37,30 +39,31 @@ class PlantCreatePageState extends State<PlantCreatePage> {
         },
         child: Stack(
           children: <Widget>[
-            ScopedModelDescendant<MainModel>(
-                builder: (BuildContext context, Widget child, model) {
-              return Container(
-                height: 400.0,
-                child: GradientImageBackground(
-                    imageFile: model.imageURL,
-                    color: Color.fromRGBO(219, 237, 145, 1.0),
-                    fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
-                    gradientOpacity: 0.50),
-              );
-            }),
-            ListView(
-              children: <Widget>[
-                _buildTitle(),
-                Container(
-                  padding: EdgeInsets.all(30.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(50.0))),
-                  child: _buildForm(),
-                ),
-              ],
-            ),
+            CameraInput(widget.cameras),
+//            ScopedModelDescendant<MainModel>(
+//                builder: (BuildContext context, Widget child, model) {
+//              return Container(
+//                height: 400.0,
+//                child: GradientImageBackground(
+//                    imageFile: model.imageURL,
+//                    color: Color.fromRGBO(219, 237, 145, 1.0),
+//                    fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
+//                    gradientOpacity: 0.50),
+//              );
+//            }),
+//            ListView(
+//              children: <Widget>[
+//                _buildTitle(),
+//                Container(
+//                  padding: EdgeInsets.all(30.0),
+//                  decoration: BoxDecoration(
+//                      color: Colors.white,
+//                      borderRadius:
+//                          BorderRadius.only(topRight: Radius.circular(50.0))),
+//                  child: _buildForm(),
+//                ),
+//              ],
+//            ),
           ],
         ),
       ),
