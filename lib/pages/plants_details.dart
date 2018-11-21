@@ -26,6 +26,9 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    double screenWidth = mediaQueryData.size.width;
+    double screenHeight = mediaQueryData.size.height;
     return WillPopScope(onWillPop: () {
       Navigator.pop(context, false);
       return Future.value(false);
@@ -37,7 +40,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
         body: Stack(
           children: <Widget>[
             Container(
-              height: widget.editMode ? 700.0 : 400.0,
+              height: screenHeight,
               child: Hero(
                 tag: 'plantImg-${plant.id}',
                 child: GradientImageBackground(
@@ -65,7 +68,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
         Transform.translate(
           child: _buildHeader(
               date: plant.daysLeft, frequency: plant.frequency.round()),
-          offset: Offset(0.0, -50.0),
+          offset: Offset(0.0, 0.0),
         ),
         _buildDescription(description: plant.description),
       ],

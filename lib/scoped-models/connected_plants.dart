@@ -29,6 +29,11 @@ mixin ConnectedPlantsModel on Model {
 
   void pickImage(File image) {
     _imageURL = image;
+    notifyListeners();
+  }
+
+  void resetImage() {
+    _imageURL = null;
   }
 
   void getCameras(List<CameraDescription> cams) {

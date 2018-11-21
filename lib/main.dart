@@ -55,6 +55,7 @@ class MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           routes: {
             '/': (BuildContext context) => checkAuth(HomePage(_model)),
+//            '/': (BuildContext context) => MyPage(),
             '/plant-create': (BuildContext context) =>
                 checkAuth(PlantCreatePage())
           },
