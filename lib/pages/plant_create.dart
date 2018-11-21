@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/components/CameraInput.dart';
 import 'package:herby_app/components/date_time_picker.dart';
-import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -41,33 +40,38 @@ class PlantCreatePageState extends State<PlantCreatePage> {
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
-              child: model.imageURL == null
-                  ? CameraInput(model.cameras, model.pickImage)
-                  : Stack(
-                      children: <Widget>[
-                        Container(
-                          height: 400.0,
-                          child: GradientImageBackground(
-                              imageFile: model.imageURL,
-                              color: Color.fromRGBO(219, 237, 145, 1.0),
-                              fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
-                              gradientOpacity: 0.50),
-                        ),
-                        ListView(
-                          children: <Widget>[
-                            _buildTitle(),
-                            Container(
-                              padding: EdgeInsets.all(30.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(50.0))),
-                              child: _buildForm(),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
+              child: CameraInput(model.cameras, model.pickImage)
+//              child: model.imageURL == null
+//                  ? AnimatedContainer(
+//                      height: 800.0,
+//                      child: CameraInput(model.cameras, model.pickImage),
+//                duration: Duration(milliseconds: 700),)
+//                  : Stack(
+//                      children: <Widget>[
+//                        Container(
+//                          height: 400.0,
+//                          child: GradientImageBackground(
+//                              imageFile: model.imageURL,
+//                              color: Color.fromRGBO(219, 237, 145, 1.0),
+//                              fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
+//                              gradientOpacity: 0.50),
+//                        ),
+//                        ListView(
+//                          children: <Widget>[
+//                            _buildTitle(),
+//                            Container(
+//                              padding: EdgeInsets.all(30.0),
+//                              decoration: BoxDecoration(
+//                                  color: Colors.white,
+//                                  borderRadius: BorderRadius.only(
+//                                      topRight: Radius.circular(50.0))),
+//                              child: _buildForm(),
+//                            ),
+//                          ],
+//                        ),
+//                      ],
+//                    )
+              ),
         ),
       );
     });

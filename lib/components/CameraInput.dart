@@ -23,7 +23,8 @@ void logError(String code, String message) =>
 class _CameraInputState extends State<CameraInput> {
   CameraController controller;
   String imagePath;
-
+  double stackOpacity = 1.0;
+  double thumbnailOpacity = 0.0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -50,12 +51,27 @@ class _CameraInputState extends State<CameraInput> {
       key: _scaffoldKey,
       body: Stack(
         children: <Widget>[
-          _cameraPreviewWidget(),
-          Positioned(
-              bottom: 30.0,
-              left: MediaQuery.of(context).size.width / 2 - 50.0,
-              child: _captureControlRowWidget()),
-//          _thumbnailWidget(),
+          AnimatedCrossFade(
+              firstChild: Stack(
+                children: <Widget>[
+                  (!controller.value.isInitialized)
+                      ? Container()
+                      : _cameraPreviewWidget(),
+                  Positioned(
+                      bottom: 30.0,
+                      left: MediaQuery.of(context).size.width / 2 - 50.0,
+                      child: _captureControlRowWidget()),
+                ],
+              ),
+              secondChild: imagePath != null
+                  ? _thumbnailWidget()
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
+              crossFadeState: imagePath == null
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: Duration(milliseconds: 700))
         ],
       ),
     );
@@ -78,15 +94,14 @@ class _CameraInputState extends State<CameraInput> {
 
   /// Display the thumbnail of the captured image or video.
   Widget _thumbnailWidget() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: imagePath == null
-          ? null
-          : SizedBox(
-              child: Image.file(File(imagePath)),
-              width: 64.0,
-              height: 64.0,
-            ),
+    final size = MediaQuery.of(context).size;
+    return SizedBox(
+      child: Image.file(
+        File(imagePath),
+        fit: BoxFit.cover,
+      ),
+      width: size.width,
+      height: size.height,
     );
   }
 
@@ -120,6 +135,11 @@ class _CameraInputState extends State<CameraInput> {
     takePicture().then((String filePath) {
       if (mounted) {
         widget.pickImage(File(filePath));
+        setState(() {
+          stackOpacity = 0.0;
+          thumbnailOpacity = 1.0;
+          imagePath = filePath;
+        });
         if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
