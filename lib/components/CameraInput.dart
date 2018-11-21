@@ -25,7 +25,6 @@ class _CameraInputState extends State<CameraInput> {
   String imagePath;
   double stackOpacity = 1.0;
   double thumbnailOpacity = 0.0;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -47,33 +46,21 @@ class _CameraInputState extends State<CameraInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Stack(
-        children: <Widget>[
-          AnimatedCrossFade(
-              firstChild: Stack(
-                children: <Widget>[
-                  (!controller.value.isInitialized)
-                      ? Container()
-                      : _cameraPreviewWidget(),
-                  Positioned(
-                      bottom: 30.0,
-                      left: MediaQuery.of(context).size.width / 2 - 50.0,
-                      child: _captureControlRowWidget()),
-                ],
-              ),
-              secondChild: imagePath != null
-                  ? _thumbnailWidget()
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    ),
-              crossFadeState: imagePath == null
-                  ? CrossFadeState.showFirst
-                  : CrossFadeState.showSecond,
-              duration: Duration(milliseconds: 700))
-        ],
-      ),
+    return Stack(
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            (!controller.value.isInitialized)
+                ? Container()
+                : _cameraPreviewWidget(),
+            Positioned(
+                bottom: 30.0,
+                left: MediaQuery.of(context).size.width / 2 - 50.0,
+                child: _captureControlRowWidget()),
+            imagePath != null ? _thumbnailWidget() : Container()
+          ],
+        ),
+      ],
     );
   }
 
@@ -127,10 +114,6 @@ class _CameraInputState extends State<CameraInput> {
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
-  void showInSnackBar(String message) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
-  }
-
   void onTakePictureButtonPressed() {
     takePicture().then((String filePath) {
       if (mounted) {
@@ -140,7 +123,6 @@ class _CameraInputState extends State<CameraInput> {
           thumbnailOpacity = 1.0;
           imagePath = filePath;
         });
-        if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
   }
@@ -159,14 +141,8 @@ class _CameraInputState extends State<CameraInput> {
     try {
       await controller.takePicture(filePath);
     } on CameraException catch (e) {
-      _showCameraException(e);
       return null;
     }
     return filePath;
-  }
-
-  void _showCameraException(CameraException e) {
-    logError(e.code, e.description);
-    showInSnackBar('Error: ${e.code}\n${e.description}');
   }
 }

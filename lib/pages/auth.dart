@@ -58,7 +58,15 @@ class AuthPageState extends State<AuthPage> {
                       topRight: Radius.circular(25.0),
                       bottomLeft: Radius.circular(20.0),
                       bottomRight: Radius.circular(10.0))),
-              child: !registerMode ? _buildLogin() : _buildRegister(),
+              child: AnimatedCrossFade(
+                  firstChild: _buildLogin(),
+                  secondChild: _buildRegister(),
+                  crossFadeState: !registerMode
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  firstCurve: Cubic(0.8, 0, 0.2, 1),
+                  secondCurve: Cubic(0.8, 0, 0.2, 1),
+                  duration: Duration(milliseconds: 300)),
             ),
             SizedBox(
               height: 30.0,

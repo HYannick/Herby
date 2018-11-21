@@ -28,6 +28,9 @@ class PlantCreatePageState extends State<PlantCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final deviceWidth = size.width;
+    final deviceHeight = size.height;
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return WillPopScope(
@@ -40,38 +43,52 @@ class PlantCreatePageState extends State<PlantCreatePage> {
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
-              child: CameraInput(model.cameras, model.pickImage)
-//              child: model.imageURL == null
-//                  ? AnimatedContainer(
-//                      height: 800.0,
-//                      child: CameraInput(model.cameras, model.pickImage),
-//                duration: Duration(milliseconds: 700),)
-//                  : Stack(
-//                      children: <Widget>[
-//                        Container(
-//                          height: 400.0,
-//                          child: GradientImageBackground(
-//                              imageFile: model.imageURL,
-//                              color: Color.fromRGBO(219, 237, 145, 1.0),
-//                              fadeColor: Color.fromRGBO(132, 204, 187, 1.0),
-//                              gradientOpacity: 0.50),
-//                        ),
-//                        ListView(
-//                          children: <Widget>[
-//                            _buildTitle(),
-//                            Container(
-//                              padding: EdgeInsets.all(30.0),
-//                              decoration: BoxDecoration(
-//                                  color: Colors.white,
-//                                  borderRadius: BorderRadius.only(
-//                                      topRight: Radius.circular(50.0))),
-//                              child: _buildForm(),
-//                            ),
-//                          ],
-//                        ),
-//                      ],
-//                    )
-              ),
+              child: Stack(
+                children: <Widget>[
+                  AnimatedPositioned(
+                    curve: Cubic(0.8, 0, 0.2, 1),
+                    duration: Duration(milliseconds: 700),
+                    child: Container(
+                        width: deviceWidth,
+                        height: deviceHeight,
+                        child: CameraInput(model.cameras, model.pickImage)),
+                  ),
+                  AnimatedContainer(
+                    curve: Cubic(0.8, 0, 0.2, 1),
+                    height: model.imageURL == null ? 0.0 : 400.0,
+                    duration: Duration(milliseconds: 700),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Color.fromRGBO(219, 237, 145, 0.5),
+                        Color.fromRGBO(132, 204, 187, 0.5)
+                      ], begin: Alignment.topCenter, end: Alignment(0.0, 0.3)),
+                    ),
+                  ),
+                  AnimatedPositioned(
+                    bottom: model.imageURL == null ? -deviceHeight : 0.0,
+                    curve: Cubic(0.8, 0, 0.2, 1),
+                    child: Container(
+                      width: deviceWidth,
+                      height: deviceHeight,
+                      child: ListView(
+                        children: <Widget>[
+                          _buildTitle(),
+                          Container(
+                            width: deviceWidth,
+                            padding: EdgeInsets.all(30.0),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(50.0))),
+                            child: _buildForm(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    duration: Duration(milliseconds: 700),
+                  ),
+                ],
+              )),
         ),
       );
     });

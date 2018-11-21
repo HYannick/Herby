@@ -40,7 +40,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
         body: Stack(
           children: <Widget>[
             Container(
-              height: screenHeight,
+              height: 400.0,
               child: Hero(
                 tag: 'plantImg-${plant.id}',
                 child: GradientImageBackground(
