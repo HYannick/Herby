@@ -52,7 +52,7 @@ class Plants extends StatelessWidget {
                     child: Container(
                         constraints: BoxConstraints.expand(height: 130.0),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
+                          borderRadius: BorderRadius.circular(15.0),
                         ),
                         child: FadeInImage(
                           height: 130.0,
@@ -67,7 +67,7 @@ class Plants extends StatelessWidget {
                   Container(
                     height: 130.0,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
+                      borderRadius: BorderRadius.circular(15.0),
                       gradient: new LinearGradient(
                           colors: [Colors.black87, Colors.transparent],
                           begin: Alignment.topCenter,

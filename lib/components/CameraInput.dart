@@ -69,47 +69,63 @@ class _CameraInputState extends State<CameraInput> {
     final size = MediaQuery.of(context).size;
     final deviceRatio = size.width / size.height;
     return Transform.scale(
-      scale: controller.value.aspectRatio / deviceRatio,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CameraPreview(controller),
-        ),
-      ),
-    );
+        scale: controller.value.aspectRatio / deviceRatio,
+        child: AnimatedContainer(
+          curve: Cubic(0.8, 0, 0.2, 1),
+          height: imagePath != null ? 400.0 : size.height,
+          duration: Duration(milliseconds: 700),
+          child: Center(
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CameraPreview(controller),
+            ),
+          ),
+        ));
   }
 
   /// Display the thumbnail of the captured image or video.
   Widget _thumbnailWidget() {
     final size = MediaQuery.of(context).size;
     return SizedBox(
-      child: Image.file(
-        File(imagePath),
-        fit: BoxFit.cover,
-      ),
+        child: FadeInImage(
       width: size.width,
-      height: size.height,
-    );
+      height: imagePath != null ? 400.0 : size.height,
+      placeholder: AssetImage('assets/drop-logo--outline.png'),
+      image: AssetImage(
+        imagePath,
+      ),
+      fit: BoxFit.cover,
+    )
+//
+//      Image.file(
+//        File(imagePath),
+//        fit: BoxFit.cover,
+//      ),
+//      width: size.width,
+//      height: imagePath != null ? 400.0 : size.height,
+        );
   }
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
-    return Container(
-      width: 100.0,
-      height: 100.0,
-      padding: EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50.0),
-          border: Border.all(color: Colors.white, width: 2.0)),
-      child: IconButton(
-        icon: const Icon(
-          Icons.camera_alt,
-          size: 40.0,
-        ),
-        color: Colors.white,
-        onPressed: onTakePictureButtonPressed,
-      ),
-    );
+    return imagePath != null
+        ? Container()
+        : Container(
+            width: 100.0,
+            height: 100.0,
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50.0),
+                border: Border.all(color: Colors.white, width: 2.0)),
+            child: IconButton(
+              icon: const Icon(
+                Icons.camera_alt,
+                size: 40.0,
+              ),
+              color: Colors.white,
+              onPressed: onTakePictureButtonPressed,
+            ),
+          );
   }
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
