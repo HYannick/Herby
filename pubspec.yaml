@@ -58,6 +58,7 @@ flutter:
     - assets/drop-logo--outline.png
     - assets/avatar-sample.jpg
     - assets/home-bg.jpg
+    - assets/drop-placeholder.png
     - assets/plant-icon--outline.svg
     - assets/photo-icon--outline.svg
   #  - images/a_dot_ham.jpeg

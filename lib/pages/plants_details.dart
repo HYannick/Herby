@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -18,6 +17,7 @@ class PlantsDetailsPage extends StatefulWidget {
 }
 
 class PlantsDetailsPageState extends State<PlantsDetailsPage> {
+  var top = 0.0;
   final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
   final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
   final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
@@ -37,27 +37,78 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
       model.selectPlant(widget.plantId);
       Plant plant = model.selectedPlant;
       return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            Container(
-              height: 400.0,
-              child: Hero(
-                tag: 'plantImg-${plant.id}',
-                child: GradientImageBackground(
-                    imgURL: plant.imgURL, color: Colors.black87),
+        body: new NotificationListener(
+          onNotification: (v) {
+            if (v is ScrollUpdateNotification)
+              setState(() => top -= v.scrollDelta / 2);
+          },
+          child: new Stack(
+            children: <Widget>[
+              //The background
+              Positioned(
+                top: top,
+                child: Hero(
+                    tag: 'plantImg-${plant.id}',
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: 400.0),
+                      child: Image.asset(
+                        plant.imgURL,
+                        fit: BoxFit.cover,
+                      ),
+                    )),
               ),
-            ),
-            SafeArea(
-              child: ListView(
-                children: <Widget>[
-                  _buildNavigation(context),
-                  _buildTitle(title: plant.name),
-                  _buildContent(plant)
+              //The scroll view
+              CustomScrollView(
+                slivers: [
+                  SliverList(
+                      delegate: SliverChildListDelegate([
+                    SizedBox(
+                      height: 300.0,
+                    ),
+                    _buildContent(plant)
+                  ]))
                 ],
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
+//          CustomScrollView(
+//        slivers: <Widget>[
+//          SliverAppBar(
+//            backgroundColor: Colors.white,
+//            pinned: true,
+//            expandedHeight: 300.0,
+//            flexibleSpace: FlexibleSpaceBar(
+//                background: Hero(
+//                    tag: 'plantImg-${plant.id}',
+//                    child: Stack(
+//                      children: <Widget>[
+//                        GradientImageBackground(
+//                            imgURL: plant.imgURL, color: Colors.black87),
+//                        _buildTitle(title: plant.name)
+//                      ],
+//                    ))),
+//            title: Text(plant.name),
+//            actions: <Widget>[
+//              IconButton(
+//                  icon: Icon(Icons.edit),
+//                  color: Colors.white,
+//                  iconSize: 30.0,
+//                  onPressed: () {
+//                    setState(() {
+//                      widget.editMode = !widget.editMode;
+//                    });
+//                  }),
+//              IconButton(
+//                  icon: Icon(Icons.delete_outline),
+//                  color: Colors.white,
+//                  iconSize: 30.0,
+//                  onPressed: () => _showWarningDialog(context)),
+//            ],
+//          ),
+//          SliverList(delegate: SliverChildListDelegate([_buildContent(plant)]))
+//        ],
+//      )
       );
     }));
   }
@@ -86,39 +137,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
         child: content);
   }
 
-  Padding _buildNavigation(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.chevron_left),
-                color: Colors.white,
-                iconSize: 30.0,
-                onPressed: () => Navigator.pop(context, false)),
-            Spacer(),
-            Row(
-              children: <Widget>[
-                IconButton(
-                    icon: Icon(Icons.edit),
-                    color: Colors.white,
-                    iconSize: 30.0,
-                    onPressed: () {
-                      setState(() {
-                        widget.editMode = !widget.editMode;
-                      });
-                    }),
-                IconButton(
-                    icon: Icon(Icons.delete_outline),
-                    color: Colors.white,
-                    iconSize: 30.0,
-                    onPressed: () => _showWarningDialog(context)),
-              ],
-            ),
-          ],
-        ));
-  }
-
   Future _showWarningDialog(BuildContext context) {
     return showDialog(
         builder: (BuildContext context) {
@@ -145,7 +163,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
   // Display Mode
   Container _buildTitle({String title = ''}) {
     return Container(
-      height: widget.editMode ? 250.0 : 100.0,
       alignment: AlignmentDirectional.centerStart,
       margin: EdgeInsets.all(20.0),
       child: Text(

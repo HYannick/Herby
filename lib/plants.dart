@@ -51,23 +51,21 @@ class Plants extends StatelessWidget {
                     tag: 'plantImg-${plant.id}',
                     child: Container(
                         constraints: BoxConstraints.expand(height: 130.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        child: FadeInImage(
-                          height: 130.0,
-                          placeholder:
-                              AssetImage('assets/drop-logo--outline.png'),
-                          image: AssetImage(
-                            plant.imgURL,
-                          ),
-                          fit: BoxFit.cover,
-                        )),
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: FadeInImage(
+                              placeholder:
+                                  AssetImage('assets/drop-logo--outline.png'),
+                              image: AssetImage(
+                                plant.imgURL,
+                              ),
+                              fit: BoxFit.cover,
+                            ))),
                   ),
                   Container(
                     height: 130.0,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.0),
+                      borderRadius: BorderRadius.circular(10.0),
                       gradient: new LinearGradient(
                           colors: [Colors.black87, Colors.transparent],
                           begin: Alignment.topCenter,

@@ -9,6 +9,7 @@ import 'package:herby_app/scoped-models/main.dart';
 
 class HomePage extends StatefulWidget {
   MainModel model;
+
   HomePage(this.model);
 
   @override
@@ -52,27 +53,29 @@ class HomePageState extends State<HomePage> {
         )),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _currentIndex == 1
-          ? FloatingActionButton(
-              elevation: 5.0,
-              backgroundColor: Colors.white,
-              child: SvgPicture.asset('assets/photo-icon--outline.svg'),
-              onPressed: () => Navigator.of(context).pushNamed('/plant-create'),
-            )
-          : FloatingActionButton(
-              elevation: 5.0,
-              backgroundColor: Colors.white,
-              child: Icon(
+      floatingActionButton: FloatingActionButton(
+        elevation: 5.0,
+        backgroundColor: Colors.white,
+        child: _currentIndex == 1
+            ? SvgPicture.asset(
+                'assets/photo-icon--outline.svg',
+                width: 20.0,
+              )
+            : Icon(
                 Icons.add,
-                size: 45.0,
+                size: 30.0,
                 color: Color.fromRGBO(140, 216, 207, 1.0),
               ),
-              onPressed: () {
-                setState(() {
-                  _currentIndex = 1;
-                });
-              },
-            ),
+        onPressed: () {
+          if (_currentIndex == 1) {
+            Navigator.of(context).pushNamed('/plant-create');
+          } else {
+            setState(() {
+              _currentIndex = 1;
+            });
+          }
+        },
+      ),
       bottomNavigationBar: BottomAppBar(
         shape: CustomCircularNotchedRectangle(),
         notchMargin: 20.0,

@@ -90,20 +90,10 @@ class _CameraInputState extends State<CameraInput> {
         child: FadeInImage(
       width: size.width,
       height: imagePath != null ? 400.0 : size.height,
-      placeholder: AssetImage('assets/drop-logo--outline.png'),
-      image: AssetImage(
-        imagePath,
-      ),
+      placeholder: AssetImage('assets/drop-placeholder.png'),
+      image: AssetImage(imagePath),
       fit: BoxFit.cover,
-    )
-//
-//      Image.file(
-//        File(imagePath),
-//        fit: BoxFit.cover,
-//      ),
-//      width: size.width,
-//      height: imagePath != null ? 400.0 : size.height,
-        );
+    ));
   }
 
   /// Display the control bar with buttons to take pictures and record videos.
