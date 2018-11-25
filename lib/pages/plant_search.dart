@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:herby_app/theme.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class PlantSearchPage extends StatefulWidget {
@@ -11,46 +12,64 @@ class PlantSearchPage extends StatefulWidget {
 }
 
 class PlantSearchPageState extends State<PlantSearchPage> {
-  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-  List<Map> results = [
-    {'imgURL': 'https://source.unsplash.com/200x202/?nature', 'name': 'Ecchi'},
-    {'imgURL': 'https://source.unsplash.com/200x203/?nature', 'name': 'Yaoi'},
-    {'imgURL': 'https://source.unsplash.com/200x204/?nature', 'name': 'Yuri'},
-    {'imgURL': 'https://source.unsplash.com/200x205/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x206/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x207/?nature', 'name': 'Patate'},
-    {'imgURL': 'https://source.unsplash.com/200x258/?nature', 'name': 'Patate'},
-  ];
+  List<Map> results = [];
   String searchValue;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      child: Column(
-        children: <Widget>[
-          _buildSearchField(),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-//                if (index == 0) {
-//                  return _buildSearchField();
-//                }
-//                if (index == results.length - 1) {
-//                  return _buildEndListInfo();
-//                }
-//                index -= 1;
-                return _buildPlantItem(context, index, results);
-              },
-              itemCount: results.length,
-            ),
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                floating: true,
+                backgroundColor: hWhite,
+                expandedHeight: 100.0,
+                elevation: 0.0,
+                flexibleSpace: FlexibleSpaceBar(
+                    background: Stack(
+                  children: <Widget>[
+                    Opacity(
+                      opacity: 0.5,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(50.0)),
+                            image: DecorationImage(
+                                image:
+                                    AssetImage('assets/auth_background@2x.png'),
+                                fit: BoxFit.cover)),
+                      ),
+                    ),
+                    Align(
+                        alignment: Alignment.center,
+                        child: _buildSearchField()),
+                  ],
+                )),
+              ),
+              SliverList(
+                  delegate: results.length == 0
+                      ? SliverChildListDelegate([
+                          SizedBox(
+                            height: 300.0,
+                          ),
+                          Container(
+                              height: 300.0,
+                              child: Center(child: _buildEndListInfo()))
+                        ])
+                      : SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                          if (index == results.length - 1) {
+                            return _buildEndListInfo();
+                          }
+                          return _buildPlantItem(context, index, results);
+                        }, childCount: results.length))
+            ],
           ),
-          _buildEndListInfo()
-        ],
-      ),
-    );
+        ));
   }
 
   Container _buildEndListInfo() {
@@ -66,7 +85,9 @@ class PlantSearchPageState extends State<PlantSearchPage> {
         ),
         Text('Take a beautiful picture',
             style: TextStyle(
-                fontSize: 20.0, fontWeight: FontWeight.bold, color: mainGreen)),
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: hMainGreen)),
         Text(
           'And fill the database!',
           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w200),
@@ -155,7 +176,45 @@ class PlantSearchPageState extends State<PlantSearchPage> {
                   return 'Search text is required and should be 2+ characters long.';
                 }
               },
-              onSaved: (String value) => searchValue = value),
+              onFieldSubmitted: (String value) {
+                searchValue = value;
+                setState(() {
+                  results = [
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x202/?nature',
+                      'name': 'Ecchi'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x203/?nature',
+                      'name': 'Yaoi'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x204/?nature',
+                      'name': 'Yuri'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x205/?nature',
+                      'name': 'Patate'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x206/?nature',
+                      'name': 'Patate'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x207/?nature',
+                      'name': 'Patate'
+                    },
+                    {
+                      'imgURL': 'https://source.unsplash.com/200x258/?nature',
+                      'name': 'Patate'
+                    },
+                  ];
+                });
+              },
+              onSaved: (String value) {
+                print(value);
+                searchValue = value;
+              }),
         ),
       ),
     );

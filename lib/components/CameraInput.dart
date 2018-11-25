@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:herby_app/theme.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CameraInput extends StatefulWidget {
@@ -71,9 +72,9 @@ class _CameraInputState extends State<CameraInput> {
     return Transform.scale(
         scale: controller.value.aspectRatio / deviceRatio,
         child: AnimatedContainer(
-          curve: Cubic(0.8, 0, 0.2, 1),
+          curve: cubicEase,
           height: imagePath != null ? 400.0 : size.height,
-          duration: Duration(milliseconds: 700),
+          duration: hDuration700,
           child: Center(
             child: AspectRatio(
               aspectRatio: controller.value.aspectRatio,

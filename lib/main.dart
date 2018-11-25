@@ -6,6 +6,7 @@ import 'package:herby_app/pages/home.dart';
 import 'package:herby_app/pages/plant_create.dart';
 import 'package:herby_app/pages/plants_details.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 List<CameraDescription> cameras;
@@ -51,11 +52,10 @@ class MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
-          theme: ThemeData(fontFamily: 'Nunito'),
+          theme: ThemeData(fontFamily: 'Nunito', backgroundColor: hWhite),
           debugShowCheckedModeBanner: false,
           routes: {
             '/': (BuildContext context) => checkAuth(HomePage(_model)),
-//            '/': (BuildContext context) => MyPage(),
             '/plant-create': (BuildContext context) =>
                 checkAuth(PlantCreatePage())
           },
@@ -70,9 +70,25 @@ class MyAppState extends State<MyApp> {
             }
             if (pathElements[1].startsWith('plant')) {
               final String plantId = pathElements[2];
-              return MaterialPageRoute<bool>(
-                  builder: (BuildContext context) =>
-                      checkAuth(PlantsDetailsPage(plantId)));
+              return PageRouteBuilder<bool>(
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) {
+                  return AnimatedBuilder(
+                      animation:
+                          CurvedAnimation(parent: animation, curve: cubicEase),
+                      builder: (BuildContext context, Widget child) {
+                        return Opacity(
+                          opacity: animation.value,
+                          child: checkAuth(PlantsDetailsPage(plantId)),
+                        );
+                      });
+                },
+                transitionDuration: hDuration300,
+              );
+
+//                MaterialPageRoute<bool>(
+//                  builder: (BuildContext context) =>
+//                      checkAuth(PlantsDetailsPage(plantId)));
             }
             return null;
           },

@@ -3,6 +3,7 @@ import 'package:herby_app/components/CameraInput.dart';
 import 'package:herby_app/components/date_time_picker.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class PlantCreatePage extends StatefulWidget {
@@ -13,13 +14,11 @@ class PlantCreatePage extends StatefulWidget {
 }
 
 class PlantCreatePageState extends State<PlantCreatePage> {
-  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-  final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
   double frequency = 1.0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> plantForm = {
     'name': '',
-    'imgURL': 'assets/Aloe Vera.jpg',
+    'imgURL': 'assets/dracaena.jpg',
     'description': '',
     'lastWatering': null,
     'daysLeft': 0,
@@ -46,8 +45,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
               child: Stack(
                 children: <Widget>[
                   AnimatedPositioned(
-                    curve: Cubic(0.8, 0, 0.2, 1),
-                    duration: Duration(milliseconds: 700),
+                    curve: cubicEase,
+                    duration: hDuration700,
                     child: Container(
                         width: deviceWidth,
                         height: deviceHeight,
@@ -55,8 +54,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                   ),
                   AnimatedOpacity(
                     opacity: model.imageURL == null ? 0.0 : 1.0,
-                    curve: Cubic(0.8, 0, 0.2, 1),
-                    duration: Duration(milliseconds: 700),
+                    curve: cubicEase,
+                    duration: hDuration700,
                     child: Container(
                       height: 400.0,
                       decoration: BoxDecoration(
@@ -72,7 +71,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                   ),
                   AnimatedPositioned(
                     bottom: model.imageURL == null ? -deviceHeight : 0.0,
-                    curve: Cubic(0.8, 0, 0.2, 1),
+                    curve: cubicEase,
                     child: Container(
                       width: deviceWidth,
                       height: deviceHeight,
@@ -91,7 +90,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                         ],
                       ),
                     ),
-                    duration: Duration(milliseconds: 700),
+                    duration: hDuration700,
                   ),
                 ],
               )),
@@ -136,7 +135,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
       return Container(
           width: 170.0,
           decoration: BoxDecoration(
-            color: mainGreen,
+            color: hMainGreen,
             borderRadius: BorderRadius.circular(15.0),
             boxShadow: [
               BoxShadow(
@@ -249,8 +248,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                 ),
                 Slider(
                   label: 'Watering Frequency',
-                  activeColor: mainGreen,
-                  inactiveColor: fadedGreen,
+                  activeColor: hMainGreen,
+                  inactiveColor: hFadedGreen,
                   onChanged: (double value) {
                     setState(() {
                       frequency = value.roundToDouble();
@@ -267,7 +266,7 @@ class PlantCreatePageState extends State<PlantCreatePage> {
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               decoration: BoxDecoration(
-                  color: mainGreen,
+                  color: hMainGreen,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25.0),
                       topRight: Radius.circular(10.0),
@@ -300,9 +299,9 @@ class PlantCreatePageState extends State<PlantCreatePage> {
           hintStyle:
               TextStyle(fontWeight: FontWeight.bold, color: Colors.black38),
           enabledBorder:
-              UnderlineInputBorder(borderSide: BorderSide(color: mainGreen)),
+              UnderlineInputBorder(borderSide: BorderSide(color: hMainGreen)),
           focusedBorder:
-              UnderlineInputBorder(borderSide: BorderSide(color: mainGreen)),
+              UnderlineInputBorder(borderSide: BorderSide(color: hMainGreen)),
         ),
         validator: (String value) {
           if (value.isEmpty || value.length <= minChar) {

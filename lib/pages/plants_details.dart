@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class PlantsDetailsPage extends StatefulWidget {
@@ -16,19 +17,50 @@ class PlantsDetailsPage extends StatefulWidget {
   }
 }
 
-class PlantsDetailsPageState extends State<PlantsDetailsPage> {
-  var top = 0.0;
-  final Color blueyColor = Color.fromRGBO(158, 181, 199, 1.0);
-  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-  final Color fadedGreen = Color.fromRGBO(140, 216, 207, 0.5);
+class BottomWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = new Path();
+    path.lineTo(0.0, size.height - 50.0);
+    path.lineTo(size.width - 50.0, size.height - 50.0);
+    var firstControlPoint = Offset(size.width, size.height - 50.0);
+    var firstEndPoint = Offset(size.width, size.height);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+        firstEndPoint.dx, firstEndPoint.dy);
+
+    path.lineTo(size.width, size.height);
+    path.lineTo(size.width, 0.0);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class PlantsDetailsPageState extends State<PlantsDetailsPage>
+    with SingleTickerProviderStateMixin {
+  AnimationController _controller;
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
+    _controller.forward().orCancel;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    double screenWidth = mediaQueryData.size.width;
-    double screenHeight = mediaQueryData.size.height;
     return WillPopScope(onWillPop: () {
       Navigator.pop(context, false);
       return Future.value(false);
@@ -37,93 +69,108 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
       model.selectPlant(widget.plantId);
       Plant plant = model.selectedPlant;
       return Scaffold(
-        body: new NotificationListener(
-          onNotification: (v) {
-            if (v is ScrollUpdateNotification)
-              setState(() => top -= v.scrollDelta / 2);
-          },
-          child: new Stack(
-            children: <Widget>[
-              //The background
-              Positioned(
-                top: top,
-                child: Hero(
-                    tag: 'plantImg-${plant.id}',
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 400.0),
-                      child: Image.asset(
-                        plant.imgURL,
-                        fit: BoxFit.cover,
-                      ),
-                    )),
-              ),
-              //The scroll view
-              CustomScrollView(
-                slivers: [
-                  SliverList(
-                      delegate: SliverChildListDelegate([
-                    SizedBox(
-                      height: 300.0,
-                    ),
-                    _buildContent(plant)
-                  ]))
-                ],
-              )
+        backgroundColor: hWhite,
+        body: SafeArea(
+            child: CustomScrollView(slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: hWhite,
+            iconTheme: IconThemeData(color: Colors.black),
+            title: Text(
+              plant.name,
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.edit),
+                  iconSize: 20.0,
+                  onPressed: () {
+                    setState(() {
+                      widget.editMode = !widget.editMode;
+                    });
+                  }),
+              IconButton(
+                  icon: Icon(Icons.delete_outline),
+                  iconSize: 20.0,
+                  onPressed: () => _showWarningDialog(context)),
             ],
           ),
-        ),
-//          CustomScrollView(
-//        slivers: <Widget>[
-//          SliverAppBar(
-//            backgroundColor: Colors.white,
-//            pinned: true,
-//            expandedHeight: 300.0,
-//            flexibleSpace: FlexibleSpaceBar(
-//                background: Hero(
-//                    tag: 'plantImg-${plant.id}',
-//                    child: Stack(
-//                      children: <Widget>[
-//                        GradientImageBackground(
-//                            imgURL: plant.imgURL, color: Colors.black87),
-//                        _buildTitle(title: plant.name)
-//                      ],
-//                    ))),
-//            title: Text(plant.name),
-//            actions: <Widget>[
-//              IconButton(
-//                  icon: Icon(Icons.edit),
-//                  color: Colors.white,
-//                  iconSize: 30.0,
-//                  onPressed: () {
-//                    setState(() {
-//                      widget.editMode = !widget.editMode;
-//                    });
-//                  }),
-//              IconButton(
-//                  icon: Icon(Icons.delete_outline),
-//                  color: Colors.white,
-//                  iconSize: 30.0,
-//                  onPressed: () => _showWarningDialog(context)),
-//            ],
-//          ),
-//          SliverList(delegate: SliverChildListDelegate([_buildContent(plant)]))
-//        ],
-//      )
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Hero(
+                      tag: 'plantImg-${plant.id}',
+                      child: Container(
+                        height: 300.0,
+                        alignment: Alignment.centerLeft,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(50.0),
+                                bottomRight: Radius.circular(20.0)),
+                            image: DecorationImage(
+                                image: AssetImage(plant.imgURL),
+                                fit: BoxFit.cover)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Text(
+                              plant.name,
+                              style: TextStyle(
+                                  color: hWhite,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 50.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50.0,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: RotatedBox(
+                        quarterTurns: 1,
+                        child: Row(
+                          children: <Widget>[
+                            Text('Watering every ',
+                                style: TextStyle(
+                                    color: Colors.black54, fontSize: 18.0)),
+                            Text('${plant.frequency} ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54,
+                                    fontSize: 18.0)),
+                            Text('days',
+                                style: TextStyle(
+                                    color: Colors.black54, fontSize: 18.0)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              _buildContent(plant)
+            ]),
+          )
+        ])),
       );
     }));
   }
 
   Container _buildContent(Plant plant) {
-    Column content = Column(
-      children: <Widget>[
-        Transform.translate(
-          child: _buildHeader(
-              date: plant.daysLeft, frequency: plant.frequency.round()),
-          offset: Offset(0.0, 0.0),
-        ),
-        _buildDescription(description: plant.description),
-      ],
-    );
+    Widget content = Transform.translate(
+        offset: Offset(0.0, -60.0),
+        child: Column(
+          children: <Widget>[
+            _buildHeader(
+                date: plant.daysLeft, frequency: plant.frequency.round()),
+            _buildDescription(description: plant.description)
+          ],
+        ));
 
     if (widget.editMode) {
       content = _buildEditMode(plant);
@@ -160,19 +207,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
         context: context);
   }
 
-  // Display Mode
-  Container _buildTitle({String title = ''}) {
-    return Container(
-      alignment: AlignmentDirectional.centerStart,
-      margin: EdgeInsets.all(20.0),
-      child: Text(
-        title,
-        style: TextStyle(
-            color: Colors.white, fontSize: 45.0, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
   Row _buildHeader({date: 0, frequency: 0.0}) {
     return Row(
       children: <Widget>[
@@ -182,7 +216,14 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
             children: <Widget>[
               Text(
                 'Next watering in',
-                style: TextStyle(fontWeight: FontWeight.w100, fontSize: 18.0),
+                style: TextStyle(
+                  color: hWhite,
+                  fontWeight: FontWeight.w100,
+                  fontSize: 18.0,
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
               ),
               Container(
                 child: Row(
@@ -191,7 +232,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 40.0,
-                            color: mainGreen)),
+                            color: hMainGreen)),
                     Text(' Days',
                         style: TextStyle(
                             fontWeight: FontWeight.w900, fontSize: 40.0)),
@@ -199,14 +240,14 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 ),
               ),
               Text('Watering every $frequency days',
-                  style: TextStyle(color: blueyColor, fontSize: 15.0)),
+                  style: TextStyle(color: hBlueColor, fontSize: 15.0)),
             ],
           ),
         ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 35.0),
           decoration: BoxDecoration(
-              color: mainGreen,
+              color: hMainGreen,
               boxShadow: [
                 BoxShadow(
                     color: Color.fromRGBO(51, 51, 51, 0.2),
@@ -278,7 +319,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: fadedGreen, width: 5.0)),
+          border: Border.all(color: hFadedGreen, width: 5.0)),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -286,10 +327,10 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildHead(
-                    text: 'Temperature', style: TextStyle(color: blueyColor)),
+                    text: 'Temperature', style: TextStyle(color: hBlueColor)),
                 _buildHead(
-                    text: 'Humidity', style: TextStyle(color: blueyColor)),
-                _buildHead(text: 'Light', style: TextStyle(color: blueyColor)),
+                    text: 'Humidity', style: TextStyle(color: hBlueColor)),
+                _buildHead(text: 'Light', style: TextStyle(color: hBlueColor)),
               ],
             ),
           ),
@@ -345,7 +386,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
               Container(
                   width: 150.0,
                   decoration: BoxDecoration(
-                    color: mainGreen,
+                    color: hMainGreen,
                     borderRadius: BorderRadius.circular(15.0),
                     boxShadow: [
                       BoxShadow(
@@ -423,8 +464,8 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
                 ),
                 Slider(
                   label: 'Watering Frequency',
-                  activeColor: mainGreen,
-                  inactiveColor: fadedGreen,
+                  activeColor: hMainGreen,
+                  inactiveColor: hFadedGreen,
                   onChanged: (double value) {
                     setState(() {
                       widget.frequency = value.roundToDouble();
@@ -441,7 +482,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage> {
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               decoration: BoxDecoration(
-                  color: mainGreen,
+                  color: hMainGreen,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25.0),
                       topRight: Radius.circular(10.0),

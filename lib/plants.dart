@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Plants extends StatelessWidget {
-  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
-
   Widget _buildPlantItem(
       BuildContext context, int index, Plant plant, Function deletePlant) {
     return GestureDetector(
@@ -33,7 +32,7 @@ class Plants extends StatelessWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.w100,
                           fontSize: 50.0,
-                          color: mainGreen),
+                          color: hMainGreen),
                     ),
                     Text(
                       'Days',
@@ -94,7 +93,7 @@ class Plants extends StatelessWidget {
             child: Text(
           plant.name,
           style: TextStyle(
-              color: mainGreen, fontWeight: FontWeight.bold, fontSize: 16.0),
+              color: hMainGreen, fontWeight: FontWeight.bold, fontSize: 16.0),
         )),
         Container(
           alignment: Alignment.topCenter,

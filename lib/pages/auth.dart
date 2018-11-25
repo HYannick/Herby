@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herby_app/components/gradientImageBackground.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class AuthPage extends StatefulWidget {
@@ -24,7 +25,6 @@ class AuthPageState extends State<AuthPage> {
   final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
 
   TextEditingController _passwordController = TextEditingController();
-  final Color mainGreen = Color.fromRGBO(140, 216, 207, 1.0);
   bool registerMode = false;
 
   @override
@@ -64,9 +64,9 @@ class AuthPageState extends State<AuthPage> {
                   crossFadeState: !registerMode
                       ? CrossFadeState.showFirst
                       : CrossFadeState.showSecond,
-                  firstCurve: Cubic(0.8, 0, 0.2, 1),
-                  secondCurve: Cubic(0.8, 0, 0.2, 1),
-                  duration: Duration(milliseconds: 300)),
+                  firstCurve: cubicEase,
+                  secondCurve: cubicEase,
+                  duration: hDuration300),
             ),
             SizedBox(
               height: 30.0,
@@ -118,7 +118,7 @@ class AuthPageState extends State<AuthPage> {
                             spreadRadius: 6.0,
                             blurRadius: 10.0)
                       ],
-                      color: mainGreen,
+                      color: hMainGreen,
                       borderRadius: BorderRadius.circular(50.0)),
                   child: FlatButton(
                       child: Text(!registerMode ? 'Login' : 'Register',
