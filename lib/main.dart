@@ -10,7 +10,6 @@ import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 List<CameraDescription> cameras;
-
 Future<Null> main() async {
   // Fetch the available cameras before initializing the app.
   try {
@@ -85,10 +84,6 @@ class MyAppState extends State<MyApp> {
                 },
                 transitionDuration: hDuration300,
               );
-
-//                MaterialPageRoute<bool>(
-//                  builder: (BuildContext context) =>
-//                      checkAuth(PlantsDetailsPage(plantId)));
             }
             return null;
           },

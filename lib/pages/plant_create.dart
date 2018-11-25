@@ -151,8 +151,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
                     'Add Plant',
                     style: TextStyle(color: Colors.white, fontSize: 16.0),
                   ),
-                  onPressed: () =>
-                      _submitPlant(model.addPlant, model.allPlants))
+                  onPressed: () => _submitPlant(
+                      model.addPlant, model.getNextWatering, model.allPlants))
               : Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Center(
@@ -161,22 +161,18 @@ class PlantCreatePageState extends State<PlantCreatePage> {
     });
   }
 
-  void _submitPlant(Function addPlant, List<Plant> plants) {
+  void _submitPlant(
+      Function addPlant, Function getNextWatering, List<Plant> plants) {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    plantForm['frequency'] = frequency.round();
     if (plantForm['lastWatering'] == null) {
       plantForm['lastWatering'] = DateTime.now();
     }
-    plantForm['daysLeft'] = plantForm['lastWatering']
-            .add(Duration(days: plantForm['frequency']))
-            .day -
-        DateTime.now().day;
-
-    if (plantForm['daysLeft'] < 0) {
-      plantForm['daysLeft'] = 0;
-    }
+    plantForm['frequency'] = frequency.round();
+    plantForm['daysLeft'] = getNextWatering(
+        lastWatering: plantForm['lastWatering'],
+        frequency: plantForm['frequency']);
 
     _formKey.currentState.save();
 

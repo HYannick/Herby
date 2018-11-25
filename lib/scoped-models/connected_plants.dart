@@ -49,6 +49,14 @@ mixin ConnectedPlantsModel on Model {
         orElse: null);
   }
 
+  int getNextWatering({DateTime lastWatering, int frequency}) {
+    DateTime nextWatering = lastWatering.add(Duration(days: frequency));
+    int daysLeft = nextWatering.difference(DateTime.now()).inDays;
+    int remainingDays = daysLeft > 0 ? daysLeft : 0;
+
+    return remainingDays;
+  }
+
   Future<bool> addPlant(Map<String, dynamic> plantForm) {
     _isLoading = true;
     notifyListeners();
@@ -284,7 +292,11 @@ mixin PlantsModel on ConnectedPlantsModel {
         );
         fetchedPlantsList.add(plant);
       });
+
       _plants = fetchedPlantsList;
+      _plants.sort((a, b) {
+        return a.daysLeft.compareTo(b.daysLeft);
+      });
       _isLoading = false;
       notifyListeners();
     } catch (e) {

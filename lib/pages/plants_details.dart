@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
@@ -41,22 +43,36 @@ class BottomWaveClipper extends CustomClipper<Path> {
 
 class PlantsDetailsPageState extends State<PlantsDetailsPage>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  AnimationController _contentController;
+  Animation<double> buttonAnimation;
+  Animation<double> fadeAnimation;
   final TextStyle tableTextStyle =
       TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
+
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
-    _controller.forward().orCancel;
+    _contentController =
+        AnimationController(duration: Duration(milliseconds: 400), vsync: this);
+    buttonAnimation = Tween(begin: 0.0, end: -60.0)
+        .animate(CurvedAnimation(parent: _contentController, curve: cubicEase))
+          ..addListener(() {
+            setState(() {});
+          });
+    fadeAnimation = Tween(begin: 0.0, end: 1.0).animate(_contentController)
+      ..addListener(() {
+        setState(() {});
+      });
+    Timer(Duration(milliseconds: 100), () {
+      _contentController.forward();
+    });
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _controller.dispose();
+    _contentController.dispose();
   }
 
   @override
@@ -163,13 +179,16 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
 
   Container _buildContent(Plant plant) {
     Widget content = Transform.translate(
-        offset: Offset(0.0, -60.0),
-        child: Column(
-          children: <Widget>[
-            _buildHeader(
-                date: plant.daysLeft, frequency: plant.frequency.round()),
-            _buildDescription(description: plant.description)
-          ],
+        offset: Offset(0.0, buttonAnimation.value),
+        child: Opacity(
+          opacity: fadeAnimation.value,
+          child: Column(
+            children: <Widget>[
+              _buildHeader(
+                  date: plant.daysLeft, frequency: plant.frequency.round()),
+              _buildDescription(description: plant.description)
+            ],
+          ),
         ));
 
     if (widget.editMode) {
@@ -239,8 +258,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
                   ],
                 ),
               ),
-              Text('Watering every $frequency days',
-                  style: TextStyle(color: hBlueColor, fontSize: 15.0)),
             ],
           ),
         ),
@@ -327,10 +344,12 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildHead(
-                    text: 'Temperature', style: TextStyle(color: hBlueColor)),
+                    text: 'Temperature',
+                    style: TextStyle(color: Colors.black54)),
                 _buildHead(
-                    text: 'Humidity', style: TextStyle(color: hBlueColor)),
-                _buildHead(text: 'Light', style: TextStyle(color: hBlueColor)),
+                    text: 'Humidity', style: TextStyle(color: Colors.black54)),
+                _buildHead(
+                    text: 'Light', style: TextStyle(color: Colors.black54)),
               ],
             ),
           ),
@@ -413,14 +432,9 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
                               style: TextStyle(color: Colors.white),
                             ),
                       onPressed: () {
-                        int daysLeft = plant.lastWatering
-                                .add(Duration(days: widget.frequency.round()))
-                                .day -
-                            DateTime.now().day;
-
-                        if (daysLeft < 0) {
-                          daysLeft = 0;
-                        }
+                        int daysLeft = model.getNextWatering(
+                            lastWatering: plant.lastWatering,
+                            frequency: widget.frequency.round());
 
                         Map<String, dynamic> updatedPlant = {
                           'id': plant.id,
