@@ -91,6 +91,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
         body: SafeArea(
             child: CustomScrollView(slivers: <Widget>[
           SliverAppBar(
+            floating: true,
             backgroundColor: hWhite,
             iconTheme: IconThemeData(color: Colors.black),
             title: Text(
