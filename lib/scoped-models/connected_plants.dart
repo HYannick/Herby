@@ -10,6 +10,13 @@ import 'package:rxdart/subjects.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+dynamic customEncode(dynamic item) {
+  if (item is DateTime) {
+    return item.toIso8601String();
+  }
+  return item;
+}
+
 mixin ConnectedPlantsModel on Model {
   List<Plant> _plants = [];
   User _authenticatedUser;
@@ -47,14 +54,6 @@ mixin ConnectedPlantsModel on Model {
 
     return _plants.firstWhere((Plant plant) => plant.id == _selectedPlantId,
         orElse: null);
-  }
-
-  int getNextWatering({DateTime lastWatering, int frequency}) {
-    DateTime nextWatering = lastWatering.add(Duration(days: frequency));
-    int daysLeft = nextWatering.difference(DateTime.now()).inDays;
-    int remainingDays = daysLeft > 0 ? daysLeft : 0;
-
-    return remainingDays;
   }
 
   Future<bool> addPlant(Map<String, dynamic> plantForm) {
@@ -202,18 +201,21 @@ mixin UsersModel on ConnectedPlantsModel {
   }
 }
 
-dynamic customEncode(dynamic item) {
-  if (item is DateTime) {
-    return item.toIso8601String();
-  }
-  return item;
-}
-
 mixin PlantsModel on ConnectedPlantsModel {
   List<Plant> get allPlants => List.from(_plants);
 
   void selectPlant(String plantId) {
     _selectedPlantId = plantId;
+  }
+
+  List<Plant> get getNonWateredPlants =>
+      _plants.where((Plant plant) => plant.daysLeft == 0).toList();
+
+  int getNextWatering({DateTime lastWatering, int frequency}) {
+    DateTime nextWatering = lastWatering.add(Duration(days: frequency));
+    int daysLeft = nextWatering.difference(DateTime.now()).inDays;
+    int remainingDays = daysLeft > 0 ? daysLeft : 0;
+    return remainingDays;
   }
 
   Future<bool> deletePlant(Plant plant) async {
@@ -286,7 +288,9 @@ mixin PlantsModel on ConnectedPlantsModel {
           name: plantData['name'],
           lastWatering: DateTime.parse(plantData['lastWatering']),
           frequency: plantData['frequency'],
-          daysLeft: plantData['daysLeft'],
+          daysLeft: getNextWatering(
+              lastWatering: DateTime.parse(plantData['lastWatering']),
+              frequency: plantData['frequency']),
           userId: plantData['userId'],
           description: plantData['description'],
         );
