@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herby_app/components/custom_notched_shapes.dart';
-import 'package:herby_app/pages/plant_search.dart';
-import 'package:herby_app/pages/profile.dart';
 import 'package:herby_app/plants_list.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/screens/plant_search.dart';
+import 'package:herby_app/screens/profile.dart';
 import 'package:herby_app/theme.dart';
 
 class HomePage extends StatefulWidget {

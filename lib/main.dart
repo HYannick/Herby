@@ -1,11 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:herby_app/components/CameraInput.dart';
-import 'package:herby_app/pages/auth.dart';
-import 'package:herby_app/pages/home.dart';
-import 'package:herby_app/pages/plant_create.dart';
-import 'package:herby_app/pages/plants_details.dart';
 import 'package:herby_app/scoped-models/main.dart';
+import 'package:herby_app/screens/auth.dart';
+import 'package:herby_app/screens/home.dart';
+import 'package:herby_app/screens/plant_create.dart';
+import 'package:herby_app/screens/plants_details.dart';
 import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
 
