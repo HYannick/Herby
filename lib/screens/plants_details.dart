@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:herby_app/components/PlantsCarousel.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:herby_app/theme.dart';
@@ -84,7 +85,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
       Plant plant = model.selectedPlant;
       double containerHeight = 300.0;
       if (mode == _modes.editMode || mode == _modes.wateredMode) {
-        containerHeight = 400.0;
+        containerHeight = 430.0;
       }
       return Scaffold(
         backgroundColor: hWhite,
@@ -196,7 +197,11 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
         content = _buildDescription(description: plant.description);
         break;
       case _modes.wateredMode:
-        content = _buildWateredContainer();
+        content = ScopedModelDescendant<MainModel>(builder:
+            (BuildContext scopedContext, Widget child, MainModel model) {
+          List<Plant> nonWateredPlants = model.getNonWateredPlants;
+          return PlantsCarousel('Plants ready for watering', nonWateredPlants);
+        });
         break;
       default:
         content = _buildDescription(description: plant.description);
@@ -220,52 +225,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
               ),
             )));
   }
-
-  Column _buildWateredContainer() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(
-            height: 20.0,
-          ),
-          Text(
-            'Plants ready for watering',
-            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10.0,
-          ),
-          ScopedModelDescendant<MainModel>(builder:
-              (BuildContext scopedContext, Widget child, MainModel model) {
-            List<Plant> nonWateredPlants = model.getNonWateredPlants;
-            return Container(
-              height: 80.0,
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: nonWateredPlants.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Plant nPlant = nonWateredPlants[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed<bool>('/plant/${nPlant.id.toString()}');
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(right: 10.0),
-                        width: 80.0,
-                        height: 80.0,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage(nPlant.imgURL),
-                                fit: BoxFit.cover),
-                            color: hFadedGreen,
-                            borderRadius: BorderRadius.circular(20.0)),
-                      ),
-                    );
-                  }),
-            );
-          }),
-        ],
-      );
 
   Future _showWarningDialog(BuildContext context) {
     return showDialog(
@@ -350,11 +309,10 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
               if (mode == _modes.editMode) {
                 return;
               }
-              DateTime now = DateTime.now();
-              int safeDays = 4;
 
-              if (now.difference(plant.lastWatering).inDays <
-                  plant.frequency - safeDays) {
+              if (!model.needWatering(
+                  lastWatering: plant.lastWatering,
+                  frequency: plant.frequency)) {
                 _showWateringWarning(plant, model);
               } else {
                 _waterPlant(model, plant);

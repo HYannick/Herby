@@ -209,13 +209,21 @@ mixin PlantsModel on ConnectedPlantsModel {
   }
 
   List<Plant> get getNonWateredPlants =>
-      _plants.where((Plant plant) => plant.daysLeft == 0).toList();
+      _plants.where((Plant plant) => plant.daysLeft <= 2).toList();
 
   int getNextWatering({DateTime lastWatering, int frequency}) {
     DateTime nextWatering = lastWatering.add(Duration(days: frequency));
     int daysLeft = nextWatering.difference(DateTime.now()).inDays;
     int remainingDays = daysLeft > 0 ? daysLeft : 0;
     return remainingDays;
+  }
+
+  bool needWatering({DateTime lastWatering, int frequency}) {
+    DateTime now = DateTime.now();
+    int safeDays = 4;
+    print(now.difference(lastWatering).inDays);
+    print(frequency - safeDays);
+    return now.difference(lastWatering).inDays > frequency - safeDays;
   }
 
   Future<bool> deletePlant(Plant plant) async {

@@ -10,8 +10,8 @@ class PlantsList extends StatelessWidget {
   final String backgroundURL = 'assets/home-bg.jpg';
   final String username = 'Math';
 
-  Widget _buildPlantItem(
-      BuildContext context, int index, Plant plant, Function deletePlant) {
+  Widget _buildPlantItem(BuildContext context, int index, Plant plant,
+      Function deletePlant, Function checkWateringState) {
     return GestureDetector(
       onTap: () => Navigator.of(context)
               .pushNamed<bool>('/plant/${plant.id.toString()}')
@@ -82,13 +82,18 @@ class PlantsList extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(15.0),
-                    child: _buildDescription(plant),
+                    child: _buildDescription(plant, checkWateringState),
                   )
                 ]),
+              ),
+              SizedBox(
+                width: 15.0,
               ),
               Container(
                 width: 80.0,
                 padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                    color: hWhite, borderRadius: BorderRadius.circular(50.0)),
                 child: Column(
                   children: <Widget>[
                     Text(
@@ -115,7 +120,7 @@ class PlantsList extends StatelessWidget {
     );
   }
 
-  Row _buildDescription(Plant plant) {
+  Row _buildDescription(Plant plant, Function needWatering) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -128,11 +133,19 @@ class PlantsList extends StatelessWidget {
         )),
         Container(
             alignment: Alignment.topCenter,
-            child: SvgPicture.asset(
-              'assets/drop-logo--plain.svg',
-              color: hWhite,
-              width: 40.0,
-            ))
+            child: needWatering(
+                    lastWatering: plant.lastWatering,
+                    frequency: plant.frequency)
+                ? SvgPicture.asset(
+                    'assets/drop-logo--plain.svg',
+                    color: hWhite,
+                    width: 30.0,
+                  )
+                : Icon(
+                    Icons.check,
+                    size: 30.0,
+                    color: hWhite,
+                  ))
       ],
     );
   }
@@ -153,6 +166,14 @@ class PlantsList extends StatelessWidget {
               ),
             ),
           ),
+          Positioned(
+              right: 55.0,
+              top: 0.0,
+              child: Container(
+                width: 2.0,
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black12,
+              )),
           CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
@@ -188,7 +209,8 @@ class PlantsList extends StatelessWidget {
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
           Plant plant = model.allPlants[index];
-          return _buildPlantItem(context, index, plant, model.deletePlant);
+          return _buildPlantItem(
+              context, index, plant, model.deletePlant, model.needWatering);
         }, childCount: model.allPlants.length));
       } else if (model.isLoading) {
         plantList = SliverList(
@@ -227,6 +249,7 @@ class PlantsList extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       child: Row(
         children: <Widget>[
+          SizedBox(width: 20.0),
           _buildHeadTitle(title),
           Container(
             width: 70.0,
