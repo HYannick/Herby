@@ -53,7 +53,6 @@ class _GuillotineMenuState extends State<GuillotineMenu>
   Animation<double> animationTitleFadeInOut;
 
   _handleMenuOpenClosed() {
-    print(menuAnimationStatus);
     if (menuAnimationStatus == _GuillotineAnimationStatus.closed) {
       animationControllerMenu.forward().orCancel;
     } else if (menuAnimationStatus == _GuillotineAnimationStatus.open) {

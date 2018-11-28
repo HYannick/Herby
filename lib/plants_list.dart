@@ -13,13 +13,16 @@ class PlantsList extends StatelessWidget {
   Widget _buildPlantItem(BuildContext context, int index, Plant plant,
       Function deletePlant, Function checkWateringState) {
     return GestureDetector(
-      onTap: () => Navigator.of(context)
-              .pushNamed<bool>('/plant/${plant.id.toString()}')
-              .then((bool value) {
-            if (value) {
-              deletePlant(plant);
-            }
-          }),
+      onTap: () {
+        print(plant.id);
+        return Navigator.of(context)
+            .pushNamed<bool>('/plant/${plant.id.toString()}')
+            .then((bool value) {
+          if (value) {
+            deletePlant(plant);
+          }
+        });
+      },
       child: Card(
         color: Colors.transparent,
         elevation: 0.0,

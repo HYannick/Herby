@@ -423,7 +423,6 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
       'imgURL': plant.imgURL,
       'userId': plant.userId
     };
-    print(updatedPlant['daysLeft']);
 //            model.selectPlant(plant.id);
 //            model.editPlant(updatedPlant);
   }

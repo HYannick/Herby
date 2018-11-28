@@ -212,7 +212,6 @@ class PlantSearchPageState extends State<PlantSearchPage> {
                 });
               },
               onSaved: (String value) {
-                print(value);
                 searchValue = value;
               }),
         ),

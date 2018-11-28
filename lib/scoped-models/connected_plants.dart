@@ -69,6 +69,7 @@ mixin ConnectedPlantsModel on Model {
             body: json.encode(plantForm, toEncodable: customEncode))
         .then((http.Response res) {
       final Map<String, dynamic> responseData = json.decode(res.body);
+      print(responseData);
       final Plant plant = Plant(
           id: responseData['name'],
           frequency: plantForm['frequency'],
@@ -290,18 +291,9 @@ mixin PlantsModel on ConnectedPlantsModel {
       }
 
       plants.forEach((String plantId, dynamic plantData) {
-        final Plant plant = Plant(
-          id: plantId,
-          imgURL: plantData['imgURL'],
-          name: plantData['name'],
-          lastWatering: DateTime.parse(plantData['lastWatering']),
-          frequency: plantData['frequency'],
-          daysLeft: getNextWatering(
-              lastWatering: DateTime.parse(plantData['lastWatering']),
-              frequency: plantData['frequency']),
-          userId: plantData['userId'],
-          description: plantData['description'],
-        );
+        Map<String, dynamic> id = {'id': plantId};
+        plantData.addAll(id);
+        final Plant plant = Plant.fromJSON(plantData);
         fetchedPlantsList.add(plant);
       });
 
