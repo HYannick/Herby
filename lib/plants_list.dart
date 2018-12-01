@@ -4,6 +4,7 @@ import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class PlantsList extends StatelessWidget {
   final String avatarURL = 'assets/avatar-sample.jpg';
@@ -14,7 +15,6 @@ class PlantsList extends StatelessWidget {
       Function deletePlant, Function checkWateringState) {
     return GestureDetector(
       onTap: () {
-        print(plant.id);
         return Navigator.of(context)
             .pushNamed<bool>('/plant/${plant.id.toString()}')
             .then((bool value) {
@@ -60,13 +60,18 @@ class PlantsList extends StatelessWidget {
                                 topLeft: Radius.circular(45.0),
                                 bottomRight: Radius.circular(45.0),
                                 bottomLeft: Radius.circular(20.0)),
-                            child: FadeInImage(
-                              placeholder:
-                                  AssetImage('assets/drop-logo--outline.png'),
-                              image: AssetImage(
-                                plant.imgURL,
-                              ),
-                              fit: BoxFit.cover,
+                            child: Stack(
+                              children: <Widget>[
+                                Center(child: CircularProgressIndicator()),
+                                Container(
+                                  constraints: BoxConstraints.expand(),
+                                  child: FadeInImage.memoryNetwork(
+                                    placeholder: kTransparentImage,
+                                    image: plant.imageURL,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              ],
                             ))),
                   ),
                   Container(

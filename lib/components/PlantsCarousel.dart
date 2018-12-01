@@ -46,7 +46,8 @@ class PlantsCarousel extends StatelessWidget {
                     height: itemHeight,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage(plant.imgURL), fit: BoxFit.cover),
+                            image: AssetImage(plant.imageURL),
+                            fit: BoxFit.cover),
                         color: hFadedGreen,
                         borderRadius: BorderRadius.circular(20.0)),
                   ),

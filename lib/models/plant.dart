@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class Plant {
   String id;
   String name;
-  String imgURL;
+  String imageURL;
+  String imagePath;
   String description;
   DateTime lastWatering;
   int daysLeft;
@@ -13,7 +14,8 @@ class Plant {
   Plant(
       {@required this.id,
       @required this.name,
-      @required this.imgURL,
+      @required this.imageURL,
+      @required this.imagePath,
       @required this.description,
       @required this.lastWatering,
       @required this.daysLeft,
@@ -28,9 +30,9 @@ class Plant {
   }
 
   Plant.fromJSON(plantData) {
-    print(plantData);
     id = plantData['id'];
-    imgURL = plantData['imgURL'];
+    imageURL = plantData['imageURL'];
+    imagePath = plantData['imagePath'];
     name = plantData['name'];
     lastWatering = DateTime.parse(plantData['lastWatering']);
     frequency = plantData['frequency'];

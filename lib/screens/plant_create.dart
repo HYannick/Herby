@@ -17,9 +17,8 @@ class PlantCreatePageState extends State<PlantCreatePage> {
   double frequency = 1.0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> plantForm = {
-    'name': '',
-    'imgURL': 'assets/dracaena.jpg',
-    'description': '',
+    'name': null,
+    'description': null,
     'lastWatering': null,
     'daysLeft': 0,
     'frequency': 1

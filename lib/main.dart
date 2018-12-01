@@ -69,8 +69,6 @@ class MyAppState extends State<MyApp> {
             }
             if (pathElements[1].startsWith('plant')) {
               final String plantId = pathElements[2];
-              print('plantid ====');
-              print(plantId);
               return PageRouteBuilder<bool>(
                 pageBuilder: (BuildContext context, Animation<double> animation,
                     Animation<double> secondaryAnimation) {

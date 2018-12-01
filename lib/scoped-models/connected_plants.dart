@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:herby_app/mime/mime.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/models/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,12 +58,61 @@ mixin ConnectedPlantsModel on Model {
         orElse: null);
   }
 
-  Future<bool> addPlant(Map<String, dynamic> plantForm) {
+  Future<Map<String, dynamic>> uploadImage(File image,
+      {String imagePath}) async {
+    final mimeTypeData = lookupMimeType(image.path).split('/');
+    final imageUploadRequest = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://us-central1-herby-47c7c.cloudfunctions.net/storeImage'));
+
+    final file = await http.MultipartFile.fromPath(
+      'image',
+      image.path,
+      contentType: MediaType(
+        mimeTypeData[0],
+        mimeTypeData[1],
+      ),
+    );
+    imageUploadRequest.files.add(file);
+    if (imagePath != null) {
+      imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
+    }
+    imageUploadRequest.headers['Authorization'] =
+        'Bearer ${_authenticatedUser.token}';
+
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        return null;
+      }
+      final responseData = json.decode(response.body);
+
+      return responseData;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  Future<bool> addPlant(Map<String, dynamic> plantForm) async {
     _isLoading = true;
     notifyListeners();
+    final uploadData = await uploadImage(imageURL);
+    if (uploadData == null) {
+      print('Upload failed.');
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
 
-    Map<String, dynamic> userId = {'userId': _authenticatedUser.id};
-    plantForm.addAll(userId);
+    Map<String, dynamic> extraData = {
+      'userId': _authenticatedUser.id,
+      'imageURL': uploadData['imageUrl'],
+      'imagePath': uploadData['imagePath']
+    };
+
+    plantForm.addAll(extraData);
 
     return http
         .post(
@@ -69,11 +120,12 @@ mixin ConnectedPlantsModel on Model {
             body: json.encode(plantForm, toEncodable: customEncode))
         .then((http.Response res) {
       final Map<String, dynamic> responseData = json.decode(res.body);
-      print(responseData);
+
       final Plant plant = Plant(
           id: responseData['name'],
           frequency: plantForm['frequency'],
-          imgURL: plantForm['imgURL'],
+          imageURL: plantForm['imageURL'],
+          imagePath: plantForm['imagePath'],
           lastWatering: plantForm['lastWatering'],
           daysLeft: plantForm['daysLeft'],
           description: plantForm['description'],
@@ -222,8 +274,6 @@ mixin PlantsModel on ConnectedPlantsModel {
   bool needWatering({DateTime lastWatering, int frequency}) {
     DateTime now = DateTime.now();
     int safeDays = 4;
-    print(now.difference(lastWatering).inDays);
-    print(frequency - safeDays);
     return now.difference(lastWatering).inDays > frequency - safeDays;
   }
 
@@ -255,7 +305,8 @@ mixin PlantsModel on ConnectedPlantsModel {
           body: json.encode(plantObj, toEncodable: customEncode));
       final Plant plant = Plant(
         id: plantObj['id'],
-        imgURL: plantObj['imgURL'],
+        imageURL: plantObj['imageURL'],
+        imagePath: plantObj['imagePath'],
         name: plantObj['name'],
         lastWatering: plantObj['lastWatering'],
         frequency: plantObj['frequency'],

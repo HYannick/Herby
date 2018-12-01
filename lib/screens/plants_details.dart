@@ -72,6 +72,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
     // TODO: implement dispose
     super.dispose();
     _contentController.dispose();
+    _buttonController.dispose();
   }
 
   @override
@@ -135,7 +136,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
                                 topRight: Radius.circular(50.0),
                                 bottomRight: Radius.circular(20.0)),
                             image: DecorationImage(
-                                image: AssetImage(plant.imgURL),
+                                image: NetworkImage(plant.imageURL),
                                 fit: BoxFit.cover)),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -420,7 +421,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
       'description': plant.description,
       'lastWatering': now,
       'name': plant.name,
-      'imgURL': plant.imgURL,
+      'imgURL': plant.imageURL,
       'userId': plant.userId
     };
 //            model.selectPlant(plant.id);
@@ -552,7 +553,7 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
                         'description': plant.description,
                         'lastWatering': plant.lastWatering,
                         'name': plant.name,
-                        'imgURL': plant.imgURL,
+                        'imgURL': plant.imageURL,
                         'userId': plant.userId
                       };
                       model.selectPlant(plant.id);
