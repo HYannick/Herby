@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:herby_app/mime/mime.dart';
+import 'package:mime/mime.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/models/user.dart';
 import 'package:http/http.dart' as http;
