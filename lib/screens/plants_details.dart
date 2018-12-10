@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:herby_app/components/PlantsCarousel.dart';
@@ -136,7 +137,8 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
                                 topRight: Radius.circular(50.0),
                                 bottomRight: Radius.circular(20.0)),
                             image: DecorationImage(
-                                image: NetworkImage(plant.imageURL),
+                                image:
+                                    CachedNetworkImageProvider(plant.imageURL),
                                 fit: BoxFit.cover)),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),

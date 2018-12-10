@@ -1,10 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herby_app/models/plant.dart';
 import 'package:herby_app/scoped-models/main.dart';
 import 'package:herby_app/theme.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class PlantsList extends StatelessWidget {
   final String avatarURL = 'assets/avatar-sample.jpg';
@@ -60,18 +60,14 @@ class PlantsList extends StatelessWidget {
                                 topLeft: Radius.circular(45.0),
                                 bottomRight: Radius.circular(45.0),
                                 bottomLeft: Radius.circular(20.0)),
-                            child: Stack(
-                              children: <Widget>[
-                                Center(child: CircularProgressIndicator()),
-                                Container(
-                                  constraints: BoxConstraints.expand(),
-                                  child: FadeInImage.memoryNetwork(
-                                    placeholder: kTransparentImage,
-                                    image: plant.imageURL,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              ],
+                            child: Container(
+                              constraints: BoxConstraints.expand(),
+                              child: CachedNetworkImage(
+                                imageUrl: plant.imageURL,
+                                fit: BoxFit.cover,
+                                placeholder:
+                                    Center(child: CircularProgressIndicator()),
+                              ),
                             ))),
                   ),
                   Container(

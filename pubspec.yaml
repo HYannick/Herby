@@ -30,6 +30,7 @@ dependencies:
   camera: ^0.2.4
   mime: ^0.9.6+2
   path_provider: ^0.4.1
+  cached_network_image: ^0.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
