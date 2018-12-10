@@ -21,9 +21,12 @@ class PlantsCarousel extends StatelessWidget {
         SizedBox(
           height: 20.0,
         ),
-        Text(
-          title,
-          style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+          ),
         ),
         SizedBox(
           height: 10.0,
@@ -41,7 +44,8 @@ class PlantsCarousel extends StatelessWidget {
                         .pushNamed<bool>('/plant/${plant.id.toString()}');
                   },
                   child: Container(
-                    margin: EdgeInsets.only(right: 10.0),
+                    margin: EdgeInsets.only(
+                        left: index == 0 ? 20.0 : 0.0, right: 10.0),
                     width: itemWidth,
                     height: itemHeight,
                     decoration: BoxDecoration(

@@ -208,8 +208,9 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
         content = _buildDescription(description: plant.description);
     }
 
+    double contentPadding = (mode != _modes.wateredMode) ? 20.0 : 0.0;
     return Container(
-        padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+        padding: EdgeInsets.only(top: 20.0),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(topRight: Radius.circular(50.0))),
@@ -220,8 +221,15 @@ class PlantsDetailsPageState extends State<PlantsDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _buildHeader(date: plant.daysLeft, plant: plant),
-                  content
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                    child: _buildHeader(date: plant.daysLeft, plant: plant),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: contentPadding, right: contentPadding),
+                    child: content,
+                  )
                 ],
               ),
             )));
